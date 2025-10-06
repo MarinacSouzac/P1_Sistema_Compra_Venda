@@ -64,3 +64,32 @@ inf_subtotal DECIMAL(10,2),
 FOREIGN KEY (ntf_id) REFERENCES notaFiscal(ntf_id),
 FOREIGN KEY (prd_id) REFERENCES produto(prd_id)
 );
+
+DELIMITER $$
+
+CREATE PROCEDURE inserirProduto(
+  IN p_nome VARCHAR(60),
+  IN p_descricao TEXT,
+  IN p_preco_venda DECIMAL(10,2),
+  IN p_qtd_estoque INT,
+  IN p_fnc_id INT
+)
+BEGIN
+  INSERT INTO produto(
+    prd_nome,
+    prd_descricao,
+    prd_preco_venda,
+    prd_qtd_estoque,
+    fnc_id
+  ) VALUES (
+    p_nome,
+    p_descricao,
+    p_preco_venda,
+    p_qtd_estoque,
+    p_fnc_id
+  );
+END $$
+
+DELIMITER ;
+
+
