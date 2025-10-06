@@ -16,13 +16,6 @@ cli_CEP CHAR(9),
 cli_pais VARCHAR(30)
 );
 
-ALTER TABLE cliente
-ADD cli_cpf VARCHAR(11),
-ADD cli_cnpj VARCHAR(14);
-
-ALTER TABLE cliente 
-MODIFY cli_estado VARCHAR(9);
-
 CREATE TABLE fornecedor(
 fnc_id INT auto_increment primary KEY,
 fnc_nome VARCHAR(50),
@@ -39,8 +32,6 @@ fnc_CEP CHAR(9),
 fnc_pais VARCHAR(30)
 );
 
-ALTER TABLE fornecedor
-MODIFY fnc_estado VARCHAR(9);
 
 CREATE TABLE produto(
 prd_id INT auto_increment primary KEY,
