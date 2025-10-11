@@ -152,7 +152,7 @@
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
-                              <Component id="lblCidade" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblCidade" min="-2" pref="159" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
@@ -177,20 +177,18 @@
                           <Component id="txtEmail" alignment="0" min="-2" pref="230" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="separate" max="32767" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="lblCpfCnpj" min="-2" max="-2" attributes="0"/>
-                                      <Component id="lblNome" min="-2" max="-2" attributes="0"/>
-                                      <Component id="lblTelefone" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace min="-2" pref="250" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="lblCpfCnpj" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lblNome" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lblTelefone" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="txtTelefone" max="32767" attributes="0"/>
+                              <EmptySpace min="-2" pref="250" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="txtCpfCnpj" alignment="0" min="-2" pref="340" max="-2" attributes="0"/>
-                          <Component id="txtNome" min="-2" pref="340" max="-2" attributes="0"/>
+                          <Component id="txtTelefone" max="32767" attributes="0"/>
+                          <Component id="txtNome" max="32767" attributes="0"/>
+                          <Component id="txtCpfCnpj" alignment="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Group type="102" attributes="0">
@@ -270,18 +268,13 @@
                   <Component id="lblTipo" min="-2" max="-2" attributes="0"/>
                   <Component id="lblCpfCnpj" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Group type="102" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="radPJ" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="radPF" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="radPJ" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="radPF" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace max="32767" attributes="0"/>
-                      <Component id="txtCpfCnpj" min="-2" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="txtCpfCnpj" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -353,13 +346,17 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txtCod">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="99" green="99" red="99" type="rgb"/>
+        </Property>
+      </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblNome">
       <Properties>
         <Property name="text" type="java.lang.String" value="Nome do Cliente"/>
       </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="txtCpfCnpj">
     </Component>
     <Component class="javax.swing.JRadioButton" name="radPF">
       <Properties>
@@ -368,6 +365,9 @@
         </Property>
         <Property name="text" type="java.lang.String" value="F&#xed;sica"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="radPFActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="lblTipo">
       <Properties>
@@ -381,6 +381,9 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Jur&#xed;dica"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="radPJActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="lblCpfCnpj">
       <Properties>
@@ -508,16 +511,25 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Salvar"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSalvarActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnLimpar">
       <Properties>
         <Property name="text" type="java.lang.String" value="Limpar os Campos"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnLimparActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnListar">
       <Properties>
         <Property name="text" type="java.lang.String" value="Listar Clientes"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnListarActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnCancelar">
       <Properties>
@@ -564,6 +576,8 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Excluir"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JFormattedTextField" name="txtCpfCnpj">
     </Component>
   </SubComponents>
 </Form>

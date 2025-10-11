@@ -4,6 +4,19 @@
  */
 package Visualização;
 
+import DAO.ClienteDAO;
+import java.text.ParseException;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.MaskFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
+
+
+
+
 /**
  *
  * @author Marina Souza
@@ -17,7 +30,103 @@ public class Cliente extends javax.swing.JFrame {
      */
     public Cliente() {
         initComponents();
+        
+        btnEditar.setEnabled(false);
+        bnExcluir.setEnabled(false);
+           
+    
+            // Coloca o cursor no campo do nome assim que a tela abrir
+            txtNome.requestFocusInWindow();
+            txtCod.setFocusable(false);
+            atualizarProximoId();
+            
+            tblCli.getSelectionModel().addListSelectionListener(e -> {
+    if (!e.getValueIsAdjusting()) {
+        int linha = tblCli.getSelectedRow();
+        btnEditar.setEnabled(linha >= 0);
+        bnExcluir.setEnabled(linha >= 0);
     }
+});
+
+// Adiciona listener no painel principal (ou frame) para clicar fora da tabela
+        getContentPane().addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                // Limpa seleção da tabela
+                tblCli.clearSelection();
+                btnEditar.setEnabled(false);
+                bnExcluir.setEnabled(false);
+            }
+        });
+
+    }
+    private void atualizarProximoId() {
+    ClienteDAO dao = new ClienteDAO();
+    int proximoId = dao.getNextId();
+    txtCod.setText(String.valueOf(proximoId));
+     }
+    
+    private void limparFormulario(){
+        txtNome.setText("");
+        txtCpfCnpj.setText("");
+        txtEmail.setText("");
+        txtTelefone.setText("");
+        txtRua.setText("");
+        txtNum.setText("");
+        txtBairro.setText("");
+        txtCidade.setText("");
+        txtCEP.setText("");
+        txtPais.setText("");
+        buttonGroup1.clearSelection();
+    }
+    public void preencherTabela(){
+        ClienteDAO cDAO=new ClienteDAO();
+        List<Beans.Cliente> listaClientes=cDAO.getCliente();
+        
+        DefaultTableModel tabelaClientes=(DefaultTableModel) tblCli.getModel();
+        tabelaClientes.setRowCount(0); 
+        
+        for(Beans.Cliente c: listaClientes){
+            Object[] obj= new Object[]{
+                c.getId(),
+                c.getNome(),
+                c.isTipo() ? "Física" : "Jurídica",
+                c.getCpf(),
+                c.getCnpj(),
+                c.getEmail(),
+                c.getTelefone(),
+                c.getPais(),
+                c.getEstado(),
+                c.getCidade(),
+                c.getCep(),
+                c.getRua(),
+                c.getNumero(),
+                c.getBairro()
+                
+            }; 
+             tabelaClientes.addRow(obj);
+        }
+        
+    }
+    private void setCpfMask() {
+    try {
+        MaskFormatter cpfMask = new MaskFormatter("###.###.###-##");
+        cpfMask.setPlaceholderCharacter('_');
+        txtCpfCnpj.setFormatterFactory(new DefaultFormatterFactory(cpfMask));
+    } catch (ParseException ex) {
+        ex.printStackTrace();
+    }
+}
+
+private void setCnpjMask() {
+    try {
+        MaskFormatter cnpjMask = new MaskFormatter("##.###.###/####-##");
+        cnpjMask.setPlaceholderCharacter('_');
+        txtCpfCnpj.setFormatterFactory(new DefaultFormatterFactory(cnpjMask));
+    } catch (ParseException ex) {
+        ex.printStackTrace();
+    }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -37,7 +146,6 @@ public class Cliente extends javax.swing.JFrame {
         lblCod = new javax.swing.JLabel();
         txtCod = new javax.swing.JTextField();
         lblNome = new javax.swing.JLabel();
-        txtCpfCnpj = new javax.swing.JTextField();
         radPF = new javax.swing.JRadioButton();
         lblTipo = new javax.swing.JLabel();
         radPJ = new javax.swing.JRadioButton();
@@ -69,6 +177,7 @@ public class Cliente extends javax.swing.JFrame {
         tblCli = new javax.swing.JTable();
         btnEditar = new javax.swing.JButton();
         bnExcluir = new javax.swing.JButton();
+        txtCpfCnpj = new javax.swing.JFormattedTextField();
         jMenuBar1 = new javax.swing.JMenuBar();
         menInicio = new javax.swing.JMenu();
         menPrincipal = new javax.swing.JMenuItem();
@@ -97,15 +206,28 @@ public class Cliente extends javax.swing.JFrame {
 
         lblCod.setText("Código do cliente");
 
+        txtCod.setEditable(false);
+        txtCod.setBackground(new java.awt.Color(153, 153, 153));
+
         lblNome.setText("Nome do Cliente");
 
         buttonGroup1.add(radPF);
         radPF.setText("Física");
+        radPF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                radPFActionPerformed(evt);
+            }
+        });
 
         lblTipo.setText("Tipo de Pessoa:");
 
         buttonGroup1.add(radPJ);
         radPJ.setText("Jurídica");
+        radPJ.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                radPJActionPerformed(evt);
+            }
+        });
 
         lblCpfCnpj.setText("CPF/CNPJ:");
 
@@ -154,10 +276,25 @@ public class Cliente extends javax.swing.JFrame {
         lblCidade.setText("Cidade");
 
         btnSalvar.setText("Salvar");
+        btnSalvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSalvarActionPerformed(evt);
+            }
+        });
 
         btnLimpar.setText("Limpar os Campos");
+        btnLimpar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimparActionPerformed(evt);
+            }
+        });
 
         btnListar.setText("Listar Clientes");
+        btnListar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnListarActionPerformed(evt);
+            }
+        });
 
         btnCancelar.setText("Cancelar");
 
@@ -292,7 +429,7 @@ public class Cliente extends javax.swing.JFrame {
                                 .addComponent(txtCidade, javax.swing.GroupLayout.PREFERRED_SIZE, 339, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(31, 31, 31)
-                                .addComponent(lblCidade)
+                                .addComponent(lblCidade, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(206, 206, 206)
@@ -310,17 +447,16 @@ public class Cliente extends javax.swing.JFrame {
                             .addComponent(lblEmail)
                             .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(lblCpfCnpj)
-                                        .addComponent(lblNome)
-                                        .addComponent(lblTelefone))
-                                    .addGap(250, 250, 250))
-                                .addComponent(txtTelefone))
-                            .addComponent(txtCpfCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblCpfCnpj)
+                                    .addComponent(lblNome)
+                                    .addComponent(lblTelefone))
+                                .addGap(250, 250, 250))
+                            .addComponent(txtTelefone)
+                            .addComponent(txtNome)
+                            .addComponent(txtCpfCnpj)))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -379,15 +515,12 @@ public class Cliente extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblTipo)
                     .addComponent(lblCpfCnpj))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(radPJ)
-                            .addComponent(radPF)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(txtCpfCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(radPJ)
+                        .addComponent(radPF))
+                    .addComponent(txtCpfCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblEmail)
@@ -488,7 +621,84 @@ public class Cliente extends javax.swing.JFrame {
         tela1.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_menENFActionPerformed
+ 
+    private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
+                                         
+    // Pegando valores do formulário
+    String nome = txtNome.getText().trim();
+    String cpfCnpj = txtCpfCnpj.getText().replaceAll("\\D", "");
+    
+    // Verifica se algum campo obrigatório está vazio
+    if (nome.isEmpty() ||
+        (radPF.isSelected() && cpfCnpj.isEmpty()) ||
+        (radPJ.isSelected() && cpfCnpj.isEmpty()) ||
+        txtEmail.getText().trim().isEmpty() ||
+        txtTelefone.getText().replaceAll("\\D","").isEmpty() ||
+        txtRua.getText().trim().isEmpty() ||
+        txtNum.getText().trim().isEmpty() ||
+        txtBairro.getText().trim().isEmpty() ||
+        txtCidade.getText().trim().isEmpty() ||
+        txtCEP.getText().trim().isEmpty() ||
+        txtPais.getText().trim().isEmpty() ||
+        (!radPF.isSelected() && !radPJ.isSelected())) 
+    {
+        JOptionPane.showMessageDialog(this, "Todos os campos são obrigatórios!");
+        return;
+    }
+    
+    // Criando o objeto Cliente
+    Beans.Cliente cliente = new Beans.Cliente();
+    ClienteDAO dao = new ClienteDAO();
+    
+    cliente.setNome(nome);
+    cliente.setTipo(radPF.isSelected()); // true = PF, false = PJ
+    cliente.setCpf(radPF.isSelected() ? cpfCnpj : null);
+    cliente.setCnpj(radPJ.isSelected() ? cpfCnpj : null);
+    cliente.setEmail(txtEmail.getText().trim());
+    cliente.setTelefone(txtTelefone.getText().replaceAll("\\D",""));
+    cliente.setRua(txtRua.getText().trim());
+    cliente.setNumero(txtNum.getText().trim());
+    cliente.setBairro(txtBairro.getText().trim());
+    cliente.setCidade(txtCidade.getText().trim());
+    cliente.setEstado((String) cmbUF.getSelectedItem());
+    cliente.setCep(txtCEP.getText().trim());
+    cliente.setPais(txtPais.getText().trim());
+    
+    // Inserindo no banco
+    int idGerado = dao.inserirCliente(cliente);
 
+    if (idGerado != -1) {
+        JOptionPane.showMessageDialog(this, "Cliente inserido com sucesso! ID: " + idGerado);
+        limparFormulario();
+        atualizarProximoId();
+        DefaultTableModel modelo = (DefaultTableModel) tblCli.getModel();
+        modelo.setRowCount(0);
+        txtNome.requestFocusInWindow();
+    } else {
+        JOptionPane.showMessageDialog(this, "Erro ao inserir cliente!");
+    }
+
+
+    }//GEN-LAST:event_btnSalvarActionPerformed
+    
+    private void radPFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radPFActionPerformed
+        txtCpfCnpj.setText(""); 
+        setCpfMask();
+    }//GEN-LAST:event_radPFActionPerformed
+
+    private void radPJActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radPJActionPerformed
+        txtCpfCnpj.setText(""); 
+        setCnpjMask();
+    }//GEN-LAST:event_radPJActionPerformed
+
+    private void btnLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparActionPerformed
+        limparFormulario();
+    }//GEN-LAST:event_btnLimparActionPerformed
+
+    private void btnListarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListarActionPerformed
+        preencherTabela();
+    }//GEN-LAST:event_btnListarActionPerformed
+    
     /**
      * @param args the command line arguments
      */
@@ -558,7 +768,7 @@ public class Cliente extends javax.swing.JFrame {
     private javax.swing.JFormattedTextField txtCEP;
     private javax.swing.JTextField txtCidade;
     private javax.swing.JTextField txtCod;
-    private javax.swing.JTextField txtCpfCnpj;
+    private javax.swing.JFormattedTextField txtCpfCnpj;
     private javax.swing.JTextField txtEmail;
     private javax.swing.JTextField txtNome;
     private javax.swing.JTextField txtNum;
