@@ -1,6 +1,7 @@
 CREATE DATABASE P1_Sistema_Compra_Venda;
 USE P1_Sistema_Compra_Venda;
 
+
 CREATE TABLE cliente (
 cli_id  INT auto_increment KEY,
 cli_nome VARCHAR(60),
@@ -15,7 +16,9 @@ cli_estado CHAR(2),
 cli_CEP CHAR(9),
 cli_pais VARCHAR(30)
 );
-
+ALTER TABLE cliente
+ADD cli_cpf VARCHAR(11),
+ADD cli_cnpj VARCHAR(14);
 CREATE TABLE fornecedor(
 fnc_id INT auto_increment primary KEY,
 fnc_nome VARCHAR(50),
@@ -67,27 +70,7 @@ FOREIGN KEY (prd_id) REFERENCES produto(prd_id)
 
 DELIMITER $$
 
-CREATE PROCEDURE inserirProduto(
-  IN p_nome VARCHAR(60),
-  IN p_descricao TEXT,
-  IN p_preco_venda DECIMAL(10,2),
-  IN p_qtd_estoque INT,
-  IN p_fnc_id INT
-)
-BEGIN
-  INSERT INTO produto(
-    prd_nome,
-    prd_descricao,
-    prd_preco_venda,
-    prd_qtd_estoque,
-    fnc_id
-  ) VALUES (
-    p_nome,
-    p_descricao,
-    p_preco_venda,
-    p_qtd_estoque,
-    p_fnc_id
-  );
+CREATE PROCEDURE 
 END $$
 
 DELIMITER ;
