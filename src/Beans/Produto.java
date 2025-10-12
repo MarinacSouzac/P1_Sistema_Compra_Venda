@@ -64,7 +64,7 @@ public class Produto {
     }
 
     public void setFornecedor(Fornecedor fornecedor) {
-        this.idFornecedor = idFornecedor;
+        this.idFornecedor = fornecedor;
     }
 
     public Fornecedor getIdFornecedor() {

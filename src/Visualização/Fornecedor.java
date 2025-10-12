@@ -30,8 +30,8 @@ public class Fornecedor extends javax.swing.JFrame {
         txtCod.setFocusable(false);
         atualizarProximoId();
         
-         tblFornecedor.getSelectionModel().addListSelectionListener(e -> {
-    if (!e.getValueIsAdjusting()) {
+        tblFornecedor.getSelectionModel().addListSelectionListener(e -> {
+        if (!e.getValueIsAdjusting()) {
         int linha = tblFornecedor.getSelectedRow();
         btnEditar.setEnabled(linha >= 0);
         btnExcluir.setEnabled(linha >= 0);
@@ -54,11 +54,11 @@ public class Fornecedor extends javax.swing.JFrame {
     }
         
     
-private void atualizarProximoId() {
-    FornecedorDAO dao = new FornecedorDAO();
-    int proximoId = dao.getNextId();
-    txtCod.setText(String.valueOf(proximoId));
-     }
+        private void atualizarProximoId() {
+            FornecedorDAO dao = new FornecedorDAO();
+            int proximoId = dao.getNextId();
+            txtCod.setText(String.valueOf(proximoId));
+             }
     
       private void limparFormulario(){
         txtNome.setText("");
@@ -626,7 +626,7 @@ private void atualizarProximoId() {
          if (nome.isEmpty() ||Cnpj.isEmpty()||txtNomeFt.getText().trim().isEmpty()
                  ||
         txtEmail.getText().trim().isEmpty() ||
-        txtTelefone.getText().replaceAll("\\D","").isEmpty() ||
+       txtTelefone.getText().replaceAll("\\D","").isEmpty() ||
         txtRua.getText().trim().isEmpty() ||
         txtNum.getText().trim().isEmpty() ||
         txtBairro.getText().trim().isEmpty() ||
@@ -653,7 +653,7 @@ private void atualizarProximoId() {
             fornecedor.setEstado((String) cmbUF.getSelectedItem());
             fornecedor.setCep(txtCEP.getText().trim());
             fornecedor.setPais(txtPais.getText().trim());
-             boolean sucesso = false;
+            boolean sucesso = false;
 
     // 🔹 Verifica se estamos no modo edição
     

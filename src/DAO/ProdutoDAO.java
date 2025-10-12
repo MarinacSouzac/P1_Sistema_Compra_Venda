@@ -4,6 +4,7 @@
  */
 package DAO;
 
+import Beans.Fornecedor;
 import Conexao.Conexao;
 import Beans.Produto;
 import java.sql.*;
@@ -29,8 +30,14 @@ public class ProdutoDAO {
     
     public int inserirProduto(Produto produto){
         String sql = "INSERT INTO produto (prd_nome,prd_cod_barras,prd_descricao,prd_preco_venda,"
-                + "prd_qtd_estoque,fnc_id VALUES(?,?,?,?,?,?)";
-        
+                + "prd_qtd_estoque,fnc_id) VALUES(?,?,?,?,?,?)";
+         // NOVO BLOCO: VERIFICAÇÃO DE NULIDADE
+    if (produto.getFornecedor() == null) {
+        System.err.println("Erro: Fornecedor do produto não pode ser nulo.");
+        // Você pode lançar uma exceção específica aqui, ou retornar -1 como um erro.
+        return -1; 
+    }
+    // FIM NOVO BLOCO
         try{
             PreparedStatement stmt = this.conn.prepareStatement
             (sql,Statement.RETURN_GENERATED_KEYS);
@@ -39,7 +46,7 @@ public class ProdutoDAO {
              stmt.setString(3, produto.getDescricao());
              stmt.setDouble(4, produto.getPrecoVenda());
              stmt.setInt(5, produto.getQtdEstoque());
-             stmt.setInt(6, produto.getIdFornecedor().getId());
+             stmt.setInt(6, produto.getFornecedor().getId());
              
               int linhasAfetadas = stmt.executeUpdate();
 
@@ -81,9 +88,10 @@ public class ProdutoDAO {
         
         public List<Produto> getProduto() {
         List<Produto> listaProdutos = new ArrayList<>();
-        String sql = "SELECT * FROM produto";
+        String sql = "SELECT * FROM produto INNER JOIN fornecedor "
+                + "USING(fnc_id)";
 
-        try {
+        try{ 
             PreparedStatement stmt = conn.prepareStatement(sql,
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
                     ResultSet.CONCUR_UPDATABLE);
@@ -93,20 +101,85 @@ public class ProdutoDAO {
             while (rs.next()) {
                 Produto produto = new Produto();
                 produto.setId(rs.getInt("prd_id"));
-                produto.setNome(rs.getInt("prd_id"));
-                produto.setCodBarras(rs.getInt("prd_cod_barras"));
-                produto.setDescricao(rs.getInt("prd_descricao"));
-                produto.setPrecoVenda(rs.getInt("prd_preco_venda"));
+                produto.setNome(rs.getString("prd_nome"));
+                produto.setCodBarras(rs.getString("prd_cod_barras"));
+                produto.setDescricao(rs.getString("prd_descricao"));
+                produto.setPrecoVenda(rs.getDouble("prd_preco_venda"));
                 produto.setQtdEstoque(rs.getInt("prd_qtd_estoque"));
-                produto.setIdFornecedor(rs.getInt("fnc_id"));
+                Fornecedor f= new Fornecedor();
                 
-                ResultSet rs= stmt.executeQuery();
+                f.setId(rs.getInt("fnc_id"));
+                f.setNome(rs.getString("fnc_nome")); 
+                produto.setFornecedor(f);
+               
+                listaProdutos.add(produto);
+                    
+                }}catch(SQLException ex){
+                       System.out.println("Erro ao consultar todos os produtos: "
+                        + ex.getMessage()); 
+                        }
                 
-                 stmt.setString(3, produto.getDescricao());
-             stmt.setDouble(4, produto.getPrecoVenda());
-             stmt.setInt(5, produto.getQtdEstoque());
-             stmt.setInt(6, produto.getIdFornecedor().getId());
+                return listaProdutos;
                 
+        }
+        
+        
+        public boolean editarProduto(Produto produto){
+            String sql = "UPDATE produto SET "
+               + "prd_nome = ?, "
+               + "prd_cod_barras = ?, "
+               + "prd_descricao = ?, "
+               + "prd_preco_venda = ?, "
+               + "prd_qtd_estoque = ?, "
+               + "fnc_id = ? "
+               + "WHERE prd_id = ?";
+            
+             // NOVO BLOCO: VERIFICAÇÃO DE NULIDADE
+    if (produto.getFornecedor() == null) {
+        System.err.println("Erro ao editar: Fornecedor do produto não pode ser nulo.");
+        return false;
+    }
+    // FIM NOVO BLOCO
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, produto.getNome());
+        stmt.setString(2, produto.getCodBarras());
+        stmt.setString(3, produto.getDescricao());
+        stmt.setDouble(4, produto.getPrecoVenda());
+        stmt.setInt(5, produto.getQtdEstoque());
+        stmt.setInt(6, produto.getFornecedor().getId()); // pega o id do fornecedor
+        stmt.setInt(7, produto.getId()); // WHERE prd_id = ?
+
+        int linhasAfetadas = stmt.executeUpdate();
+        return linhasAfetadas > 0;
+
+    } catch (SQLException ex) {
+        System.out.println("Erro ao editar produto: " + ex.getMessage());
+        return false;
+    }
+    }
+    
+    public void excluirProduto(Produto produto) {
+    String sql = "DELETE FROM produto WHERE prd_id = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, produto.getId());
+        int linhasAfetadas = stmt.executeUpdate();
+        if (linhasAfetadas > 0) {
+            System.out.println("Produto excluído com sucesso!");
+        } else {
+            System.out.println("Nenhum produto encontrado com esse ID.");
+        }
+    } catch (SQLException ex) {
+        System.out.println("Erro ao excluir produto: " + ex.getMessage());
+    }
+}
+
+        
+                
+                
+                
+                
+
                 
 
         

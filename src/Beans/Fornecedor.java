@@ -23,6 +23,11 @@ public class Fornecedor {
     private String estado;
     private String cep;
     private String pais;
+    
+    @Override
+    public String toString() {
+        return this.id+"-"+this.nome; // Mostra o nome no JComboBox
+    }
 
     public int getId() {
         return id;
