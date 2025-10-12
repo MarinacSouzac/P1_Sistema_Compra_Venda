@@ -20,7 +20,7 @@ public class ClienteDAO {
         String sql = "INSERT INTO cliente (cli_nome, cli_tipo, "
                 + "cli_email, cli_telefone, cli_rua, cli_numero, cli_bairro, "
                 + "cli_cidade, cli_estado, cli_CEP, cli_pais, cli_cpf, cli_cnpj) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         try {
             PreparedStatement stmt = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -114,5 +114,63 @@ public class ClienteDAO {
 
         return listaClientes;
     }
+    
+    public boolean editarCliente(Cliente cliente) {
+    String sql = "UPDATE cliente SET "
+            + "cli_nome = ?, "
+            + "cli_tipo = ?, "
+            + "cli_email = ?, "
+            + "cli_telefone = ?, "
+            + "cli_rua = ?, "
+            + "cli_numero = ?, "
+            + "cli_bairro = ?, "
+            + "cli_cidade = ?, "
+            + "cli_estado = ?, "
+            + "cli_CEP = ?, "
+            + "cli_pais = ?, "
+            + "cli_cpf = ?, "
+            + "cli_cnpj = ? "
+            + "WHERE cli_id = ?"; // <- MUITO IMPORTANTE!
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, cliente.getNome());
+        stmt.setInt(2, cliente.isTipo() ? 1 : 0);
+        stmt.setString(3, cliente.getEmail());
+        stmt.setString(4, cliente.getTelefone());
+        stmt.setString(5, cliente.getRua());
+        stmt.setString(6, cliente.getNumero());
+        stmt.setString(7, cliente.getBairro());
+        stmt.setString(8, cliente.getCidade());
+        stmt.setString(9, cliente.getEstado());
+        stmt.setString(10, cliente.getCep());
+        stmt.setString(11, cliente.getPais());
+        stmt.setString(12, cliente.getCpf());
+        stmt.setString(13, cliente.getCnpj());
+        stmt.setInt(14, cliente.getId()); // WHERE cli_id = ?
+
+        int linhasAfetadas = stmt.executeUpdate();
+        return linhasAfetadas > 0;
+
+    } catch (SQLException ex) {
+        System.out.println("Erro ao editar cliente: " + ex.getMessage());
+        return false;
+    }
+    
+}
+    public void excluirCliente(Cliente cliente) {
+        String sql = "DELETE FROM cliente WHERE cli_id=?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, cliente.getId());
+            int linhasAfetadas = stmt.executeUpdate();
+            if (linhasAfetadas > 0) {
+                System.out.println("Cliente excluído com sucesso!");
+            } else {
+                System.out.println("Nenhum cliente encontrado com esse ID.");
+            }
+        } catch (SQLException ex) {
+            System.out.println("Erro ao excluir cliente: " + ex.getMessage());
+        }
+    }
+
 }
 
