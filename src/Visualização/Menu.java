@@ -42,6 +42,11 @@ public class Menu extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
 
+        jPanel1.setBackground(new java.awt.Color(255, 204, 255));
+
+        btnCadCliente.setBackground(new java.awt.Color(204, 204, 204));
+        btnCadCliente.setFont(new java.awt.Font("Segoe UI Semibold", 1, 12)); // NOI18N
+        btnCadCliente.setForeground(new java.awt.Color(0, 0, 0));
         btnCadCliente.setText("Cadastro Cliente");
         btnCadCliente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -49,6 +54,9 @@ public class Menu extends javax.swing.JFrame {
             }
         });
 
+        btnCadFornecedor.setBackground(new java.awt.Color(204, 204, 204));
+        btnCadFornecedor.setFont(new java.awt.Font("Segoe UI Semibold", 1, 12)); // NOI18N
+        btnCadFornecedor.setForeground(new java.awt.Color(0, 0, 0));
         btnCadFornecedor.setText("Cadastro Fornecedor");
         btnCadFornecedor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -56,6 +64,9 @@ public class Menu extends javax.swing.JFrame {
             }
         });
 
+        btnCadProduto.setBackground(new java.awt.Color(204, 204, 204));
+        btnCadProduto.setFont(new java.awt.Font("Segoe UI Semibold", 0, 12)); // NOI18N
+        btnCadProduto.setForeground(new java.awt.Color(0, 0, 0));
         btnCadProduto.setText("Cadastro Produto");
         btnCadProduto.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -63,6 +74,9 @@ public class Menu extends javax.swing.JFrame {
             }
         });
 
+        btnNF.setBackground(new java.awt.Color(204, 204, 204));
+        btnNF.setFont(new java.awt.Font("Segoe UI Semibold", 0, 12)); // NOI18N
+        btnNF.setForeground(new java.awt.Color(0, 0, 0));
         btnNF.setText("Emissão de Notas Fiscais");
         btnNF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -70,7 +84,9 @@ public class Menu extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setBackground(new java.awt.Color(255, 153, 153));
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(51, 51, 51));
         jLabel1.setText("Sistema: Compra & Venda");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);

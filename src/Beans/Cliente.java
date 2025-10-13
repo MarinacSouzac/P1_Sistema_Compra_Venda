@@ -5,7 +5,7 @@
 package Beans;
 
 /**
- *
+ * Classe Criada para Criar Objeto Cliente
  * @author Marina Souza
  */
 public class Cliente {
@@ -25,8 +25,13 @@ public class Cliente {
     private String cpf;
     private String cnpj;
     
+    //Sobreescrita
+    @Override
+    public String toString() {
+        return this.id+"-"+this.nome; 
+    }
     
-
+    //Getters e Setters
     public int getId() {
         return id;
     }

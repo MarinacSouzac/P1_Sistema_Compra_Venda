@@ -3,19 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/Visualização/Cliente.java</file>
-            <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/Visualização/Fornecedor.java</file>
-            <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/Visualização/Menu.java</file>
-            <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/Visualização/NotaFiscal.java</file>
-            <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/Visualização/Produto.java</file>
-            <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/Conexao/Conexao.java</file>
-            <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/Menu.java</file>
-            <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/Beans/Cliente.java</file>
-            <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/Beans/Fornecedor.java</file>
-            <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/Beans/Produto.java</file>
             <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/Beans/NotaFiscal.java</file>
+            <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/Visualização/Fornecedor.java</file>
             <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/Beans/ItemNotaFiscal.java</file>
-            <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/DAO/ClienteDAO.java</file>
+            <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/Beans/Fornecedor.java</file>
+            <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/Visualização/NotaFiscal.java</file>
+            <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/Visualização/ConsultaNotaFiscal.java</file>
+            <file>file:/C:/Users/Marina%20Souza/Documents/NetBeansProjects/P1_SISITEMA_COMPRA_VENDA/src/Beans/Cliente.java</file>
         </group>
     </open-files>
 </project-private>

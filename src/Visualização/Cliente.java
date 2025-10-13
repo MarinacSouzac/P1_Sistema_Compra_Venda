@@ -29,8 +29,6 @@ public class Cliente extends javax.swing.JFrame {
         btnEditar.setEnabled(false);
         bnExcluir.setEnabled(false);
         
-    
-            // Coloca o cursor no campo do nome assim que a tela abrir
             txtNome.requestFocusInWindow();
             txtCod.setFocusable(false);
             atualizarProximoId();
@@ -43,7 +41,7 @@ public class Cliente extends javax.swing.JFrame {
     }
 });
 
-// Adiciona listener no painel principal (ou frame) para clicar fora da tabela
+
         getContentPane().addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -425,14 +423,10 @@ private void setCnpjMask() {
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(36, 36, 36)
                                 .addComponent(lblUF)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(txtCidade, javax.swing.GroupLayout.PREFERRED_SIZE, 339, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(31, 31, 31)
-                                .addComponent(lblCidade, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))))
+                            .addComponent(txtCidade, javax.swing.GroupLayout.PREFERRED_SIZE, 339, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblCidade, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(206, 206, 206)
                         .addComponent(lblTitulo))
@@ -623,7 +617,8 @@ private void setCnpjMask() {
         btnSalvar.setText("Atualizar");
 
         JOptionPane.showMessageDialog(this, 
-            "Modo de edição ativado. Faça as alterações e clique em 'Atualizar'.");
+            "Modo de edição ativado. Faça as alterações e clique "
+                    + "em 'Atualizar'.");
     } else {
         JOptionPane.showMessageDialog(this, 
             "Selecione um cliente na tabela para editar!");
@@ -724,7 +719,8 @@ private void setCnpjMask() {
         sucesso = (idGerado != -1);
 
         if (sucesso) {
-            JOptionPane.showMessageDialog(this, "Cliente inserido com sucesso! ID: " + idGerado);
+            JOptionPane.showMessageDialog(this, "Cliente inserido com sucesso! "
+                    + "ID: " + idGerado);
         } else {
             JOptionPane.showMessageDialog(this, "Erro ao inserir cliente!");
         }
@@ -735,19 +731,21 @@ private void setCnpjMask() {
         sucesso = dao.editarCliente(cliente);
 
         if (sucesso) {
-            JOptionPane.showMessageDialog(this, "Cliente atualizado com sucesso!");
+            JOptionPane.showMessageDialog(this, 
+                    "Cliente atualizado com sucesso!");
         } else {
-            JOptionPane.showMessageDialog(this, "Erro ao atualizar cliente!");
+            JOptionPane.showMessageDialog(this, 
+                    "Erro ao atualizar cliente!");
         }
         edicaoAtiva= false;
     }
 
-    // 🔹 Atualiza a interface após salvar/editar
+    
     if (sucesso) {
-        limparFormulario();         // Zera os campos e botão
-        atualizarProximoId();       // Atualiza o próximo ID, se necessário
+        limparFormulario();         
+        atualizarProximoId();       
         DefaultTableModel modelo = (DefaultTableModel) tblCli.getModel();
-        modelo.setRowCount(0);      // Limpa tabela para recarregar
+        modelo.setRowCount(0);     
         txtNome.requestFocusInWindow();
     }
     }//GEN-LAST:event_btnSalvarActionPerformed
@@ -775,7 +773,7 @@ private void setCnpjMask() {
 
     if (linhaSelecionada >= 0) {
         DefaultTableModel modelo = (DefaultTableModel) tblCli.getModel();
-        int id = (int) modelo.getValueAt(linhaSelecionada, 0); // pega o ID da linha selecionada
+        int id = (int) modelo.getValueAt(linhaSelecionada, 0);
 
         // Confirmação antes de excluir
         int opcao = JOptionPane.showConfirmDialog(this, 
@@ -790,7 +788,7 @@ private void setCnpjMask() {
 
             // Chama o DAO para excluir
             ClienteDAO dao = new ClienteDAO();
-            dao.excluirCliente(cliente); // método void que você já ajustou
+            dao.excluirCliente(cliente); 
 
             // Remove a linha da tabela
             modelo.removeRow(linhaSelecionada);
@@ -798,7 +796,8 @@ private void setCnpjMask() {
             JOptionPane.showMessageDialog(this, "Cliente excluído com sucesso!");
         }
     } else {
-        JOptionPane.showMessageDialog(this, "Selecione um cliente na tabela para excluir!");
+        JOptionPane.showMessageDialog(this, "Selecione um cliente na "
+                + "tabela para excluir!");
     }
     }//GEN-LAST:event_bnExcluirActionPerformed
 

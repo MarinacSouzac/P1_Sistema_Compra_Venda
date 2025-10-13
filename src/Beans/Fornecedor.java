@@ -6,6 +6,7 @@ package Beans;
 
 /**
  *
+ * Classe Criada para Criar Objeto Fornecedor
  * @author Marina Souza
  */
 public class Fornecedor {
@@ -24,11 +25,13 @@ public class Fornecedor {
     private String cep;
     private String pais;
     
+    //Metodo de Sobreescrita
     @Override
     public String toString() {
         return this.id+"-"+this.nome; // Mostra o nome no JComboBox
     }
-
+    
+    //Getters e Setters
     public int getId() {
         return id;
     }

@@ -5,18 +5,20 @@
 package Beans;
 
 /**
- *
+ * 
+ * Classe Criada para Criar Objeto Item da Nota Fiscak
  * @author Marina Souza
  */
 public class ItemNotaFiscal {
     
     private int id;
-    private NotaFiscal idNtf;
-    private Produto idPrd;
+    private NotaFiscal notaFiscal;
+    private Produto produto;
     private int quantidade;
     private double precoUnidade;
     private double subtotal;
-
+    
+    //Getters e Setters
     public int getId() {
         return id;
     }
@@ -25,20 +27,20 @@ public class ItemNotaFiscal {
         this.id = id;
     }
 
-    public NotaFiscal getIdNtf() {
-        return idNtf;
+    public NotaFiscal getNtf() {
+        return notaFiscal;
     }
 
-    public void setIdNtf(NotaFiscal idNtf) {
-        this.idNtf = idNtf;
+    public void setNtf(NotaFiscal notaFiscal) {
+        this.notaFiscal = notaFiscal;
     }
 
-    public Produto getIdPrd() {
-        return idPrd;
+    public Produto getPrd() {
+        return produto;
     }
 
-    public void setIdPrd(Produto idPrd) {
-        this.idPrd = idPrd;
+    public void setPrd(Produto idPrd) {
+        this.produto = produto;
     }
 
     public int getQuantidade() {

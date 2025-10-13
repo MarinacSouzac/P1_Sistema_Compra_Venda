@@ -1,6 +1,8 @@
 CREATE DATABASE P1_Sistema_Compra_Venda;
 USE P1_Sistema_Compra_Venda;
 
+SELECT * FROM cliente;
+SELECT * FROM fornecedor;
 CREATE TABLE cliente (
 cli_id  INT auto_increment KEY,
 cli_nome VARCHAR(60),
@@ -40,8 +42,13 @@ fnc_pais VARCHAR(30)
 );
 
 ALTER TABLE fornecedor
+MODIFY fnc_estado CHAR(2);
+
+ALTER TABLE fornecedor
 MODIFY fnc_estado VARCHAR(9);
 
+
+SELECT * FROM produto;
 CREATE TABLE produto(
 prd_id INT auto_increment primary KEY,
 prd_nome VARCHAR(60),
@@ -52,6 +59,12 @@ fnc_id INT,
 FOREIGN KEY (fnc_id) REFERENCES fornecedor(fnc_id)
 );
 
+ALTER TABLE produto
+ADD prd_cod_barras VARCHAR(13);
+
+
+desc notafiscal;
+SELECT*FROM notaFiscal;
 CREATE TABLE notaFiscal(
 ntf_id INT auto_increment primary KEY,
 ntf_data_venda DATETIME,
@@ -62,7 +75,12 @@ fnc_id INT,
 FOREIGN KEY (cli_id) REFERENCES cliente(cli_id),
 FOREIGN KEY (fnc_id) REFERENCES fornecedor(fnc_id)
 );
+ALTER TABLE notaFiscal 
+ADD ntf_valor_total DECIMAL(10,2) DEFAULT 0;
+ALTER TABLE notaFiscal
+MODIFY ntf_data_venda DATE;
 
+SELECT * FROM itemNotaFiscal;
 CREATE TABLE itemNotaFiscal(
 inf_id INT auto_increment KEY,
 ntf_id INT,
@@ -73,3 +91,6 @@ inf_subtotal DECIMAL(10,2),
 FOREIGN KEY (ntf_id) REFERENCES notaFiscal(ntf_id),
 FOREIGN KEY (prd_id) REFERENCES produto(prd_id)
 );
+
+SELECT*FROM  produto;
+DELETE FROM produto WHERE fnc_id = 3;  

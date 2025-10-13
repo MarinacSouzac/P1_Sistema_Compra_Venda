@@ -21,8 +21,8 @@ private boolean edicaoAtiva=false;
 private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Produto.class.getName());
     public Produto() {
         initComponents();
-        preencherComboFornecedores();
-        limparFormulario();
+        //preencherComboFornecedores();
+        //limparFormulario();
         btnEditar.setEnabled(false);
         btnExcluir.setEnabled(false);
         txtPrd.requestFocusInWindow();
@@ -39,15 +39,12 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
          getContentPane().addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
-                // Limpa seleção da tabela
                 tblProduto.clearSelection();
                 btnEditar.setEnabled(false);
                 btnExcluir.setEnabled(false);
             }
         });
-        
-        
-    
+      
     }
    
     private void atualizarProximoId() {
@@ -82,7 +79,8 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
         ProdutoDAO pDAO=new ProdutoDAO();
         List<Beans.Produto> listaProdutos=pDAO.getProduto();
         
-        DefaultTableModel tabelaProdutos=(DefaultTableModel) tblProduto.getModel();
+        DefaultTableModel tabelaProdutos=(DefaultTableModel) 
+                tblProduto.getModel();
         tabelaProdutos.setRowCount(0); 
         
         for(Beans.Produto c: listaProdutos){
@@ -150,6 +148,7 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
         lblCod.setText("Código do produto");
 
         txtCod.setEditable(false);
+        txtCod.setBackground(new java.awt.Color(153, 153, 153));
 
         lblNome.setText("Nome do produto");
 
@@ -395,9 +394,9 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnEditar)
-                            .addComponent(btnExcluir)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnExcluir)
+                            .addComponent(btnEditar)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(cmbFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
@@ -415,7 +414,45 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
     }//GEN-LAST:event_btnListarActionPerformed
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
-        // TODO add your handling code here:
+        int linhaSelecionada = tblProduto.getSelectedRow();
+    
+    if (linhaSelecionada >= 0) {
+        edicaoAtiva=true;
+        DefaultTableModel modelo = (DefaultTableModel) tblProduto.getModel();
+
+      
+        int id = (int) modelo.getValueAt(linhaSelecionada, 0);
+        String nome = (String) modelo.getValueAt(linhaSelecionada, 1);
+        String codBarras = (String) modelo.getValueAt(linhaSelecionada, 2);
+        String descricao = (String) modelo.getValueAt(linhaSelecionada, 3);
+        String Fornecedor = (String) modelo.getValueAt(linhaSelecionada, 4);
+        double precoVenda = (double) modelo.getValueAt(linhaSelecionada, 5);
+        int qtdEstoque = (Integer) modelo.getValueAt(linhaSelecionada, 6);
+
+        txtCod.setText(String.valueOf(id));
+        txtPrd.setText(nome);
+        txtCodB.setText(codBarras);
+        txtDescricao.setText(descricao);
+        txtPreco.setText(String.valueOf(precoVenda));
+        txtQtdEstoque.setValue(qtdEstoque);
+
+        
+        for (int i = 0; i < cmbFornecedor.getItemCount(); i++) {
+            Fornecedor f = (Fornecedor) cmbFornecedor.getItemAt(i);
+            if (f.getNome().equals(Fornecedor)) {
+                cmbFornecedor.setSelectedIndex(i);
+                break;
+            }
+        }
+        btnSalvar.setText("Atualizar");
+
+        JOptionPane.showMessageDialog(this, 
+            "Modo de edição ativado. Faça as alterações e "
+                    + "clique em 'Atualizar'.");
+    } else {
+        JOptionPane.showMessageDialog(this, 
+            "Selecione um cliente na tabela para editar!");
+    }  
     }//GEN-LAST:event_btnEditarActionPerformed
 
     private void menPrincipalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menPrincipalActionPerformed
@@ -443,30 +480,27 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
     }//GEN-LAST:event_menENFActionPerformed
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
-        // Pega os valores dos campos
+
     String nome = txtPrd.getText().trim();
     String codBarras = txtCodB.getText().trim();
     String descricao = txtDescricao.getText().trim();
-    double precoVenda;
+    double precoVenda=Double.parseDouble(txtPreco.getText().trim());;
 
-    try {
-        precoVenda = Double.parseDouble(txtPreco.getText().trim());
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "Preço inválido!");
-        return;
-    }
+    
 
     int qtdEstoque = (Integer) txtQtdEstoque.getValue();
-    Fornecedor fornecedorSelecionado = (Fornecedor) cmbFornecedor.getSelectedItem();
+    Fornecedor fornecedorSelecionado = (Fornecedor) 
+            cmbFornecedor.getSelectedItem();
 
-    // Validação dos campos
     if (nome.isEmpty() || codBarras.isEmpty() || descricao.isEmpty() 
-            || precoVenda <= 0 || qtdEstoque < 0 || fornecedorSelecionado == null) {
+            || precoVenda <= 0 || qtdEstoque < 0 || 
+            fornecedorSelecionado == null) 
+    {
         JOptionPane.showMessageDialog(this, "Todos os campos são obrigatórios!");
         return;
     }
-   System.out.println("Fornecedor selecionado: " + cmbFornecedor.getSelectedItem());
-    // Cria o produto
+   System.out.println("Fornecedor selecionado: " + 
+           cmbFornecedor.getSelectedItem());
     Beans.Produto produto = new Beans.Produto();
     produto.setNome(nome);
     produto.setCodBarras(codBarras);
@@ -480,35 +514,36 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
 
     if (!edicaoAtiva) {
         // Inserir
-        System.out.println("Fornecedor dentro do produto: " + produto.getFornecedor());
+        System.out.println("Fornecedor dentro do produto: " 
+                + produto.getFornecedor());
         int idGerado = dao.inserirProduto(produto);
         sucesso = (idGerado != -1);
         if (sucesso) {
-            JOptionPane.showMessageDialog(this, "Produto inserido com sucesso! ID: " + idGerado);
+            JOptionPane.showMessageDialog(this, 
+                    "Produto inserido com sucesso! ID: " + idGerado);
         } else {
             JOptionPane.showMessageDialog(this, "Erro ao inserir produto!");
         }
     } else {
-        // Atualizar
+
         int id = Integer.parseInt(txtCod.getText().trim());
         produto.setId(id);
         sucesso = dao.editarProduto(produto);
         if (sucesso) {
-            JOptionPane.showMessageDialog(this, "Produto atualizado com sucesso!");
+            JOptionPane.showMessageDialog(this, 
+                    "Produto atualizado com sucesso!");
         } else {
             JOptionPane.showMessageDialog(this, "Erro ao atualizar produto!");
         }
         edicaoAtiva = false;
-    }
-
-    // Se sucesso, limpa formulário e atualiza tabela
+    } 
     if (sucesso) {
         limparFormulario();
         atualizarProximoId();
         DefaultTableModel modelo = (DefaultTableModel) tblProduto.getModel();
-        modelo.setRowCount(0); // limpa tabela
+        modelo.setRowCount(0); 
         txtPrd.requestFocusInWindow();
-    }           // Limpa tabela para recarregar
+    }           
 
     }//GEN-LAST:event_btnSalvarActionPerformed
 
@@ -536,7 +571,7 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
 
             // Chama o DAO para excluir
             FornecedorDAO dao = new FornecedorDAO();
-            dao.excluirFornecedor(fornecedor); // método void que você já ajustou
+            dao.excluirFornecedor(fornecedor); 
 
             // Remove a linha da tabela
             modelo.removeRow(linhaSelecionada);
@@ -549,7 +584,7 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
     }//GEN-LAST:event_btnExcluirActionPerformed
 
     private void txtPrecoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPrecoActionPerformed
-        // TODO add your handling code here:
+
     }//GEN-LAST:event_txtPrecoActionPerformed
 
     /**

@@ -19,11 +19,13 @@ public class ClienteDAO {
     public int inserirCliente(Cliente cliente) {
         String sql = "INSERT INTO cliente (cli_nome, cli_tipo, "
                 + "cli_email, cli_telefone, cli_rua, cli_numero, cli_bairro, "
-                + "cli_cidade, cli_estado, cli_CEP, cli_pais, cli_cpf, cli_cnpj) "
+                + "cli_cidade, cli_estado, "
+                + "cli_CEP, cli_pais, cli_cpf, cli_cnpj) "
                 + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         try {
-            PreparedStatement stmt = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement stmt = this.conn.prepareStatement
+            (sql, Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, cliente.getNome());
             stmt.setInt(2, cliente.isTipo() ? 1 : 0);
             stmt.setString(3, cliente.getEmail());
@@ -41,14 +43,16 @@ public class ClienteDAO {
             int linhasAfetadas = stmt.executeUpdate();
 
             if (linhasAfetadas == 0) {
-                throw new SQLException("Falha ao inserir cliente, nenhuma linha afetada.");
+                throw new SQLException("Falha ao inserir cliente, "
+                        + "nenhuma linha afetada.");
             }
 
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     return generatedKeys.getInt(1);
                 } else {
-                    throw new SQLException("Falha ao obter o ID do cliente inserido.");
+                    throw new SQLException("Falha ao obter "
+                            + "o ID do cliente inserido.");
                 }
             }
 
@@ -60,7 +64,8 @@ public class ClienteDAO {
 
     public int getNextId() {
         int nextId = 1;
-        String sql = "SELECT COALESCE(MAX(cli_id), 0) + 1 AS nextId FROM cliente";
+        String sql = "SELECT COALESCE(MAX(cli_id), 0) + "
+                + "1 AS nextId FROM cliente";
 
         try {
             PreparedStatement ps = this.conn.prepareStatement(sql);
@@ -109,7 +114,8 @@ public class ClienteDAO {
             }
 
         } catch (SQLException ex) {
-            System.out.println("Erro ao consultar todas as pessoas: " + ex.getMessage());
+            System.out.println("Erro ao consultar todas as pessoas: " 
+                    + ex.getMessage());
         }
 
         return listaClientes;
@@ -130,7 +136,7 @@ public class ClienteDAO {
             + "cli_pais = ?, "
             + "cli_cpf = ?, "
             + "cli_cnpj = ? "
-            + "WHERE cli_id = ?"; // <- MUITO IMPORTANTE!
+            + "WHERE cli_id = ?"; 
 
     try (PreparedStatement stmt = conn.prepareStatement(sql)) {
         stmt.setString(1, cliente.getNome());
@@ -146,7 +152,7 @@ public class ClienteDAO {
         stmt.setString(11, cliente.getPais());
         stmt.setString(12, cliente.getCpf());
         stmt.setString(13, cliente.getCnpj());
-        stmt.setInt(14, cliente.getId()); // WHERE cli_id = ?
+        stmt.setInt(14, cliente.getId()); 
 
         int linhasAfetadas = stmt.executeUpdate();
         return linhasAfetadas > 0;

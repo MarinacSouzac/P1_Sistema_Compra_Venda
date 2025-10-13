@@ -29,15 +29,16 @@ public class ProdutoDAO {
     
     
     public int inserirProduto(Produto produto){
-        String sql = "INSERT INTO produto (prd_nome,prd_cod_barras,prd_descricao,prd_preco_venda,"
+        String sql = "INSERT INTO produto (prd_nome,prd_cod_barras,"
+                + "prd_descricao,prd_preco_venda,"
                 + "prd_qtd_estoque,fnc_id) VALUES(?,?,?,?,?,?)";
-         // NOVO BLOCO: VERIFICAÇÃO DE NULIDADE
+       
     if (produto.getFornecedor() == null) {
         System.err.println("Erro: Fornecedor do produto não pode ser nulo.");
-        // Você pode lançar uma exceção específica aqui, ou retornar -1 como um erro.
+        
         return -1; 
     }
-    // FIM NOVO BLOCO
+
         try{
             PreparedStatement stmt = this.conn.prepareStatement
             (sql,Statement.RETURN_GENERATED_KEYS);
@@ -51,14 +52,16 @@ public class ProdutoDAO {
               int linhasAfetadas = stmt.executeUpdate();
 
             if (linhasAfetadas == 0) {
-                throw new SQLException("Falha ao inserir cliente, nenhuma linha afetada.");
+                throw new SQLException("Falha ao inserir cliente, "
+                        + "nenhuma linha afetada.");
             }
 
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     return generatedKeys.getInt(1);
                 } else {
-                    throw new SQLException("Falha ao obter o ID do cliente inserido.");
+                    throw new SQLException("Falha ao obter o ID do "
+                            + "cliente inserido.");
                 }
             }
 
@@ -115,7 +118,8 @@ public class ProdutoDAO {
                 listaProdutos.add(produto);
                     
                 }}catch(SQLException ex){
-                       System.out.println("Erro ao consultar todos os produtos: "
+                       System.out.println("Erro ao consultar "
+                               + "todos os produtos: "
                         + ex.getMessage()); 
                         }
                 
@@ -136,7 +140,8 @@ public class ProdutoDAO {
             
              // NOVO BLOCO: VERIFICAÇÃO DE NULIDADE
     if (produto.getFornecedor() == null) {
-        System.err.println("Erro ao editar: Fornecedor do produto não pode ser nulo.");
+        System.err.println("Erro ao editar: Fornecedor do produto "
+                + "não pode ser nulo.");
         return false;
     }
     // FIM NOVO BLOCO
@@ -147,8 +152,8 @@ public class ProdutoDAO {
         stmt.setString(3, produto.getDescricao());
         stmt.setDouble(4, produto.getPrecoVenda());
         stmt.setInt(5, produto.getQtdEstoque());
-        stmt.setInt(6, produto.getFornecedor().getId()); // pega o id do fornecedor
-        stmt.setInt(7, produto.getId()); // WHERE prd_id = ?
+        stmt.setInt(6, produto.getFornecedor().getId()); 
+        stmt.setInt(7, produto.getId()); 
 
         int linhasAfetadas = stmt.executeUpdate();
         return linhasAfetadas > 0;
@@ -171,7 +176,57 @@ public class ProdutoDAO {
         }
     } catch (SQLException ex) {
         System.out.println("Erro ao excluir produto: " + ex.getMessage());
+    }}
+    
+    public List<Produto> getProdutosPorFornecedor(int idFornecedor) {
+    List<Produto> listaProdutos = new ArrayList<>();
+
+    String sql = "SELECT * FROM produto WHERE fnc_id = ?";
+
+    try {
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, idFornecedor);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            Beans.Produto p = new Beans.Produto();
+            p.setId(rs.getInt("prd_id"));
+            p.setNome(rs.getString("prd_nome"));
+            p.setPrecoVenda(rs.getDouble("prd_preco_venda"));
+            p.setQtdEstoque(rs.getInt("prd_qtd_estoque"));
+ 
+            listaProdutos.add(p);
+        }
+
+    } catch (SQLException e) {
+        System.out.println("Erro ao buscar produtos do fornecedor: " + 
+                e.getMessage());
     }
+    
+    
+    return listaProdutos;
+}
+public Produto buscarPorNome(String nome) {
+    String sql = "SELECT * FROM produto WHERE prd_nome = ?";
+    try (Connection conn = new Conexao().getConexao();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        stmt.setString(1, nome);
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            Produto p = new Produto();
+            p.setId(rs.getInt("prd_id"));
+            p.setNome(rs.getString("prd_nome"));
+            p.setPrecoVenda(rs.getDouble("prd_preco_venda"));
+            return p;
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return null;
+}
 }
 
         
@@ -185,4 +240,4 @@ public class ProdutoDAO {
         
     
     
-}
+

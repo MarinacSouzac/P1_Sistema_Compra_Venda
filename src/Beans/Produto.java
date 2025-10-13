@@ -18,7 +18,11 @@ public class Produto {
     private String codBarras;
     
     
-
+    @Override
+    public String toString() {
+        return this.id+"-"+this.nome; // Mostra o nome no JComboBox
+    }
+    
     public int getId() {
         return id;
     }
