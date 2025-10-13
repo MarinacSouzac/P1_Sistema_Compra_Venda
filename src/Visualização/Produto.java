@@ -21,14 +21,13 @@ private boolean edicaoAtiva=false;
 private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Produto.class.getName());
     public Produto() {
         initComponents();
-        //preencherComboFornecedores();
-        //limparFormulario();
+        preencherComboFornecedores();
+        limparFormulario();
         btnEditar.setEnabled(false);
         btnExcluir.setEnabled(false);
         txtPrd.requestFocusInWindow();
         txtCod.setFocusable(false);
         atualizarProximoId();
-        
         tblProduto.getSelectionModel().addListSelectionListener(e -> {
         if (!e.getValueIsAdjusting()) {
         int linha = tblProduto.getSelectedRow();
@@ -72,7 +71,7 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
         }
         if (cmbFornecedor.getItemCount() > 0) {
         cmbFornecedor.setSelectedIndex(0);
-}
+        }
     }
     
      public void preencherTabela(){
