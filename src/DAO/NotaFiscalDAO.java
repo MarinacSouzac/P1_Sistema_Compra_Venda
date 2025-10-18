@@ -20,8 +20,8 @@ public class NotaFiscalDAO {
     }
 
     public int inserirNotaFiscal(NotaFiscal nota) {
-        String sql = "INSERT INTO notaFiscal (ntf_data_venda, ntf_tipo, ntf_quant_vend, ntf_valor_total, cli_id, fnc_id, ntf_status) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO notaFiscal (ntf_data_venda, ntf_tipo, ntf_quant_vend, ntf_valor_total, cli_id, fnc_id) "
+                   + "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setDate(1, Date.valueOf(nota.getDataVenda()));
@@ -37,7 +37,6 @@ public class NotaFiscalDAO {
                 stmt.setInt(6, nota.getFornecedor() != null ? nota.getFornecedor().getId() : Types.NULL);
             }
 
-            stmt.setInt(7, nota.isStatus() ? 1 : 0);
 
             int linhas = stmt.executeUpdate();
             if (linhas == 0) throw new SQLException("Falha ao inserir nota fiscal.");
@@ -99,7 +98,7 @@ public class NotaFiscalDAO {
                 n.setTipo(rs.getInt("ntf_tipo") == 1);
                 n.setQtdTotal(rs.getInt("ntf_quant_vend"));
                 n.setValorTotal(rs.getDouble("ntf_valor_total"));
-                n.setStatus(rs.getInt("ntf_status") == 1);
+
 
                 Cliente c = new Cliente();
                 c.setId(rs.getInt("cli_id"));
@@ -120,4 +119,82 @@ public class NotaFiscalDAO {
 
         return lista;
     }
+    
+    public List<NotaFiscal> buscarPorTipo(int tipo) {
+    List<NotaFiscal> lista = new ArrayList<>();
+    String sql = "SELECT n.*, c.cli_nome, f.fnc_nome FROM notaFiscal n "
+               + "LEFT JOIN cliente c ON n.cli_id = c.cli_id "
+               + "LEFT JOIN fornecedor f ON n.fnc_id = f.fnc_id "
+               + "WHERE n.ntf_tipo = ?"; // 
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, tipo);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            NotaFiscal n = new NotaFiscal();
+            n.setId(rs.getInt("ntf_id"));
+            n.setDataVenda(rs.getDate("ntf_data_venda").toLocalDate());
+            n.setTipo(rs.getInt("ntf_tipo") == 1);
+            n.setQtdTotal(rs.getInt("ntf_quant_vend"));
+            n.setValorTotal(rs.getDouble("ntf_valor_total"));
+    
+
+            Cliente c = new Cliente();
+            c.setId(rs.getInt("cli_id"));
+            c.setNome(rs.getString("cli_nome"));
+            n.setCliente(c);
+
+            Fornecedor f = new Fornecedor();
+            f.setId(rs.getInt("fnc_id"));
+            f.setNome(rs.getString("fnc_nome"));
+            n.setFornecedor(f);
+
+            lista.add(n);
+        }
+
+    } catch (SQLException ex) {
+        System.out.println("Erro ao buscar notas fiscais por tipo: " + ex.getMessage());
+    }
+
+    return lista;
+}
+public NotaFiscal buscarPorId(int id) {
+    String sql = "SELECT n.*, c.cli_nome, f.fnc_nome FROM notaFiscal n " +
+                 "LEFT JOIN cliente c ON n.cli_id = c.cli_id " +
+                 "LEFT JOIN fornecedor f ON n.fnc_id = f.fnc_id " +
+                 "WHERE n.ntf_id = ?";
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, id);
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            NotaFiscal nf = new NotaFiscal();
+            nf.setId(rs.getInt("ntf_id"));
+            nf.setDataVenda(rs.getDate("ntf_data_venda").toLocalDate());
+            nf.setTipo(rs.getInt("ntf_tipo") == 1);
+            nf.setQtdTotal(rs.getInt("ntf_quant_vend"));
+            nf.setValorTotal(rs.getDouble("ntf_valor_total"));
+
+            Cliente c = new Cliente();
+            c.setId(rs.getInt("cli_id"));
+            c.setNome(rs.getString("cli_nome"));
+            nf.setCliente(c);
+
+            Fornecedor f = new Fornecedor();
+            f.setId(rs.getInt("fnc_id"));
+            f.setNome(rs.getString("fnc_nome"));
+            nf.setFornecedor(f);
+
+            return nf;
+        }
+
+    } catch (SQLException ex) {
+        System.out.println("Erro ao buscar nota por ID: " + ex.getMessage());
+    }
+
+    return null;
+}
+
 }

@@ -32,8 +32,8 @@ public void setNtf(NotaFiscal notaFiscal) {
     this.notaFiscal = notaFiscal;
 }
 
-        public Produto getPrd() {  // estava ok
-        return produto;
+   public Produto getPrd() {  // estava ok
+   return produto;
     }
 
     public void setPrd(Produto produto) {  // aqui tinha idPrd e atribuía produto errado

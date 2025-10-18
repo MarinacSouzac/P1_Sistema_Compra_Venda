@@ -22,7 +22,7 @@ public class Fornecedor extends javax.swing.JFrame {
 
     public Fornecedor() {
         initComponents();
-        
+        setLocationRelativeTo(null);
         limparFormulario();
         btnEditar.setEnabled(false);
         btnExcluir.setEnabled(false);
@@ -37,6 +37,7 @@ public class Fornecedor extends javax.swing.JFrame {
         btnExcluir.setEnabled(linha >= 0);
     }
 });
+        ((DefaultTableModel) tblFornecedor.getModel()).setRowCount(0);
 
 // Adiciona listener no painel principal (ou frame) para clicar fora da tabela
         getContentPane().addMouseListener(new java.awt.event.MouseAdapter() {
@@ -155,6 +156,7 @@ public class Fornecedor extends javax.swing.JFrame {
         menPrd = new javax.swing.JMenuItem();
         menNF = new javax.swing.JMenu();
         menENF = new javax.swing.JMenuItem();
+        menLNF = new javax.swing.JMenuItem();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -364,6 +366,14 @@ public class Fornecedor extends javax.swing.JFrame {
             }
         });
         menNF.add(menENF);
+
+        menLNF.setText("Listar Notas Fiscais");
+        menLNF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menLNFActionPerformed(evt);
+            }
+        });
+        menNF.add(menLNF);
 
         jMenuBar2.add(menNF);
 
@@ -730,6 +740,12 @@ public class Fornecedor extends javax.swing.JFrame {
     }
     }//GEN-LAST:event_btnExcluirActionPerformed
 
+    private void menLNFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menLNFActionPerformed
+        ConsultaNotaFiscal tela= new ConsultaNotaFiscal();
+        tela.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_menLNFActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -786,6 +802,7 @@ public class Fornecedor extends javax.swing.JFrame {
     private javax.swing.JMenu menCliente;
     private javax.swing.JMenuItem menENF;
     private javax.swing.JMenu menInicio;
+    private javax.swing.JMenuItem menLNF;
     private javax.swing.JMenu menNF;
     private javax.swing.JMenuItem menPrd;
     private javax.swing.JMenuItem menPrincipal;

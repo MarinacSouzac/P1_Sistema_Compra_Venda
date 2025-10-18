@@ -24,7 +24,7 @@ public class Cliente extends javax.swing.JFrame {
 
     public Cliente() {
         initComponents();
-        
+        setLocationRelativeTo(null);
         limparFormulario();
         btnEditar.setEnabled(false);
         bnExcluir.setEnabled(false);
@@ -40,7 +40,8 @@ public class Cliente extends javax.swing.JFrame {
         bnExcluir.setEnabled(linha >= 0);
     }
 });
-
+       
+       ((DefaultTableModel) tblCli.getModel()).setRowCount(0);
 
         getContentPane().addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -51,7 +52,7 @@ public class Cliente extends javax.swing.JFrame {
                 bnExcluir.setEnabled(false);
             }
         });
-
+      
     }
     private void atualizarProximoId() {
     ClienteDAO dao = new ClienteDAO();
@@ -176,6 +177,7 @@ private void setCnpjMask() {
         menPrd = new javax.swing.JMenuItem();
         menNF = new javax.swing.JMenu();
         menENF = new javax.swing.JMenuItem();
+        menLNF = new javax.swing.JMenuItem();
 
         lblNome4.setText("CNPJ:");
 
@@ -398,6 +400,14 @@ private void setCnpjMask() {
         });
         menNF.add(menENF);
 
+        menLNF.setText("Listar Notas Fiscais");
+        menLNF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menLNFActionPerformed(evt);
+            }
+        });
+        menNF.add(menLNF);
+
         jMenuBar1.add(menNF);
 
         setJMenuBar(jMenuBar1);
@@ -478,7 +488,6 @@ private void setCnpjMask() {
                                         .addGap(139, 139, 139))
                                     .addComponent(txtBairro)))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(btnListar)
                                 .addGap(39, 39, 39))))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING))
@@ -624,8 +633,7 @@ private void setCnpjMask() {
     }//GEN-LAST:event_menInicioActionPerformed
 
     private void menFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menFornecedorActionPerformed
-        Fornecedor tela= new Fornecedor();
-        tela.setVisible(true);
+      
     }//GEN-LAST:event_menFornecedorActionPerformed
 
     private void menProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menProdutoActionPerformed
@@ -796,8 +804,15 @@ private void setCnpjMask() {
     }//GEN-LAST:event_bnExcluirActionPerformed
 
     private void txtCodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCodActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_txtCodActionPerformed
+
+    private void menLNFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menLNFActionPerformed
+        ConsultaNotaFiscal tela= new ConsultaNotaFiscal();
+        tela.setVisible(true);
+        this.dispose();
+       
+    }//GEN-LAST:event_menLNFActionPerformed
     
     /**
      * @param args the command line arguments
@@ -856,6 +871,7 @@ private void setCnpjMask() {
     private javax.swing.JMenu menFornecedor;
     private javax.swing.JMenuItem menFrn;
     private javax.swing.JMenu menInicio;
+    private javax.swing.JMenuItem menLNF;
     private javax.swing.JMenu menNF;
     private javax.swing.JMenuItem menPrd;
     private javax.swing.JMenuItem menPrincipal;

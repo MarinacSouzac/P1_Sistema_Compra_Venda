@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package Visualização;
 
 import DAO.ProdutoDAO;
@@ -12,15 +9,13 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JComboBox;
 
-/**
- *
- * @author Marina Souza
- */
+
 public class Produto extends javax.swing.JFrame {
 private boolean edicaoAtiva=false;    
 private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Produto.class.getName());
     public Produto() {
         initComponents();
+        setLocationRelativeTo(null);
         preencherComboFornecedores();
         limparFormulario();
         btnEditar.setEnabled(false);
@@ -43,6 +38,8 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
                 btnExcluir.setEnabled(false);
             }
         });
+         
+         ((DefaultTableModel) tblProduto.getModel()).setRowCount(0);
       
     }
    
@@ -137,6 +134,7 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
         menFrn = new javax.swing.JMenuItem();
         menNF = new javax.swing.JMenu();
         menENF = new javax.swing.JMenuItem();
+        menLNF = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -281,6 +279,14 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
             }
         });
         menNF.add(menENF);
+
+        menLNF.setText("Listar Notas Fiscais");
+        menLNF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menLNFActionPerformed(evt);
+            }
+        });
+        menNF.add(menLNF);
 
         jMenuBar1.add(menNF);
 
@@ -586,6 +592,12 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
 
     }//GEN-LAST:event_txtPrecoActionPerformed
 
+    private void menLNFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menLNFActionPerformed
+        ConsultaNotaFiscal tela= new ConsultaNotaFiscal();
+        tela.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_menLNFActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -636,6 +648,7 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
     private javax.swing.JMenu menFornecedor;
     private javax.swing.JMenuItem menFrn;
     private javax.swing.JMenu menInicio;
+    private javax.swing.JMenuItem menLNF;
     private javax.swing.JMenu menNF;
     private javax.swing.JMenuItem menPrincipal;
     private javax.swing.JTable tblProduto;

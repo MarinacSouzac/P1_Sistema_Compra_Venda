@@ -16,11 +16,15 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class NotaFiscal extends javax.swing.JFrame {
-    
+
+
   
     public NotaFiscal() {
         initComponents();
+        setLocationRelativeTo(null);
         configurarTipoNota();
+        txtCod.setFocusable(false);
+        txtData.setFocusable(false);
         atualizarProximoId();
         
            // --- Eventos ---
@@ -28,7 +32,6 @@ public class NotaFiscal extends javax.swing.JFrame {
         btnAdicionarItem.addActionListener(e -> adicionarItem());
         btnSalvar.addActionListener(e -> salvarNota());
         btnLimpar.addActionListener(e -> limparCampos());
-        btnExcluir.addActionListener(e -> cancelarNota());
         cmbFornecedor.addActionListener(e -> carregarProdutosPorFornecedor());
         btnExcluir.addActionListener(e -> excluirItemSelecionado());
 
@@ -37,6 +40,11 @@ public class NotaFiscal extends javax.swing.JFrame {
                 btnExcluir.setEnabled(true);
             }
         });
+        
+        ((DefaultTableModel) tblNotaFiscal.getModel()).setRowCount(0);
+        
+        txtData.setText(java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+
     }
     
     private void atualizarProximoId() {
@@ -257,7 +265,7 @@ private void excluirItemSelecionado() {
                         item.getQuantidade(),
                         item.getPrecoUnidade(),
                         item.getSubtotal(),
-                        nota.isStatus() ? "Ativa" : "Cancelada"
+                       
                 });
             }
         }
@@ -395,8 +403,11 @@ private void excluirItemSelecionado() {
         menFrn = new javax.swing.JMenuItem();
         menProduto = new javax.swing.JMenu();
         menPrd = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setLocation(new java.awt.Point(0, 0));
         setResizable(false);
 
         lblTitulo.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
@@ -585,6 +596,18 @@ private void excluirItemSelecionado() {
 
         jMenuBar1.add(menProduto);
 
+        jMenu1.setText("Nota Fiscal");
+
+        jMenuItem1.setText("Listar Notas Fiscais");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
+
+        jMenuBar1.add(jMenu1);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -721,7 +744,9 @@ private void excluirItemSelecionado() {
     }//GEN-LAST:event_btnAdicionarItemActionPerformed
 
     private void btnListarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListarActionPerformed
-        
+         ConsultaNotaFiscal tela= new ConsultaNotaFiscal();
+         tela.setVisible(true);
+         this.dispose();        
     }//GEN-LAST:event_btnListarActionPerformed
 
     private void menPrincipalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menPrincipalActionPerformed
@@ -757,8 +782,9 @@ private void excluirItemSelecionado() {
     }//GEN-LAST:event_btnExcluirActionPerformed
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
-          
-   salvarNota();
+          salvarNota();
+        
+
     }//GEN-LAST:event_btnSalvarActionPerformed
 
     private void btnLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparActionPerformed
@@ -781,6 +807,12 @@ private void excluirItemSelecionado() {
       
     }//GEN-LAST:event_cmbProdutoActionPerformed
 
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        ConsultaNotaFiscal tela= new ConsultaNotaFiscal();
+        tela.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
 
         public static void main(String args[]) {
         
@@ -799,7 +831,9 @@ private void excluirItemSelecionado() {
     private javax.swing.JComboBox cmbFornecedor;
     private javax.swing.JComboBox cmbProduto;
     private javax.swing.JComboBox<String> cmbTipo;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JLabel lblCliente;
