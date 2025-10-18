@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import Beans.Cliente;
 import Beans.Fornecedor;
+import java.time.LocalDate;
 
 /**
  *
@@ -17,13 +18,14 @@ public class NotaFiscal {
   
     
     private int id;
-    private LocalDateTime dataVenda;
+    private LocalDate dataVenda;
     private boolean tipo;
     private int qtdTotal;
     private double valorTotal;
     private Cliente cliente;
     private Fornecedor fornecedor;
     private List<ItemNotaFiscal> itens; 
+    private boolean status = true; 
 
     public List<ItemNotaFiscal> getItens() {
         return itens;
@@ -42,13 +44,13 @@ public class NotaFiscal {
         this.id = id;
     }
 
-    public LocalDateTime getDataVenda() {
+    public LocalDate getDataVenda() {
         return dataVenda;
     }
 
-    public void setDataVenda(LocalDateTime dataVenda) {
-        this.dataVenda = dataVenda;
-    }
+   public void setDataVenda(LocalDate dataVenda) { 
+    this.dataVenda = dataVenda;
+}
 
     public boolean isTipo() {
         return tipo;
@@ -90,6 +92,13 @@ public class NotaFiscal {
 
     public void setValorTotal(double valorTotal) {
         this.valorTotal = valorTotal;
+    }
+    
+    public boolean isStatus() {
+        return status;
+    }
+    public void setStatus(boolean status) {
+        this.status = status;
     }
     
     

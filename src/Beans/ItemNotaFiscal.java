@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package Beans;
 
 /**
@@ -27,19 +24,19 @@ public class ItemNotaFiscal {
         this.id = id;
     }
 
-    public NotaFiscal getNtf() {
-        return notaFiscal;
-    }
+   public NotaFiscal getNtf() {
+    return notaFiscal;
+}
 
-    public void setNtf(NotaFiscal notaFiscal) {
-        this.notaFiscal = notaFiscal;
-    }
+public void setNtf(NotaFiscal notaFiscal) {
+    this.notaFiscal = notaFiscal;
+}
 
-    public Produto getPrd() {
+        public Produto getPrd() {  // estava ok
         return produto;
     }
 
-    public void setPrd(Produto idPrd) {
+    public void setPrd(Produto produto) {  // aqui tinha idPrd e atribuía produto errado
         this.produto = produto;
     }
 

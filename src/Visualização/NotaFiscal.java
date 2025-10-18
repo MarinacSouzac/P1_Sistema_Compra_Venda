@@ -2,293 +2,356 @@
 package Visualização;
 
 import DAO.NotaFiscalDAO;
-import Beans.Produto;
-import Beans.Fornecedor;
-import Beans.Cliente;
-import Beans.ItemNotaFiscal;
+import DAO.ProdutoDAO;
 import DAO.FornecedorDAO;
 import DAO.ClienteDAO;
 import DAO.ItemNotaFiscalDAO;
-import DAO.ProdutoDAO;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import Beans.ItemNotaFiscal;
+import Beans.Produto;
+import Beans.Fornecedor;
+import Beans.Cliente;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author Marina Souza
- */
 public class NotaFiscal extends javax.swing.JFrame {
-     // DAO
-    private NotaFiscalDAO notaDAO = new NotaFiscalDAO();
-    private FornecedorDAO fornecedorDAO = new FornecedorDAO();
-    private ClienteDAO clienteDAO = new ClienteDAO();
-    private ProdutoDAO produtoDAO = new ProdutoDAO();
-    private Fornecedor fornecedorAtual = null;
-    private Cliente clienteAtual = null;
-
-   
-    private DefaultTableModel tabelaModel;
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(NotaFiscal.class.getName());
+    
   
     public NotaFiscal() {
         initComponents();
-        inicializarFormulario();
-    }
-    private void inicializarFormulario() {
-     cmbCliente.setEnabled(false);
-        cmbFornecedor.setEnabled(false);
-        cmbProduto.setEnabled(false);
-        spnQtd.setEnabled(false);
-        btnAdicionarItem.setEnabled(false);
-        btnExcluir.setEnabled(false);
-
-        txtCod.setText(String.valueOf(notaDAO.getNextId()));
-        txtData.setText(""); 
-
-        preencherComboFornecedores();
-        preencherComboClientes();
-        preencherComboProdutos();
-
-        tabelaModel = (DefaultTableModel) tblNotaFiscal.getModel();
-        tabelaModel.setRowCount(0);
-
-        cmbTipo.addActionListener(e -> atualizarCamposPorTipo());
-        cmbFornecedor.addActionListener(e -> atualizarProdutosPorFornecedor());
-        cmbCliente.addActionListener(e -> atualizarProdutosParaSaida());
+        configurarTipoNota();
+        atualizarProximoId();
+        
+           // --- Eventos ---
+        cmbTipo.addActionListener(e -> configurarTipoNota());
+        btnAdicionarItem.addActionListener(e -> adicionarItem());
+        btnSalvar.addActionListener(e -> salvarNota());
+        btnLimpar.addActionListener(e -> limparCampos());
+        btnExcluir.addActionListener(e -> cancelarNota());
+        cmbFornecedor.addActionListener(e -> carregarProdutosPorFornecedor());
+        btnExcluir.addActionListener(e -> excluirItemSelecionado());
 
         tblNotaFiscal.getSelectionModel().addListSelectionListener(e -> {
-            btnExcluir.setEnabled(tblNotaFiscal.getSelectedRow() >= 0);
-        });
-}
-    private void atualizarCamposPorTipo() {
-    String tipo = (String) cmbTipo.getSelectedItem();
-        limparTabelaSeNaoVazia();
-
-        fornecedorAtual = null;
-        clienteAtual = null;
-
-        if ("0-Entrada".equals(tipo)) {
-            cmbFornecedor.setEnabled(true);
-            cmbCliente.setEnabled(false);
-            cmbCliente.setSelectedIndex(-1);
-        } else if ("1-Saída".equals(tipo)) {
-            cmbCliente.setEnabled(true);
-            cmbFornecedor.setEnabled(false);
-            cmbFornecedor.setSelectedIndex(-1);
-        }
-
-        cmbProduto.setEnabled(false);
-        spnQtd.setEnabled(false);
-        btnAdicionarItem.setEnabled(false);
-        btnExcluir.setEnabled(false);
-    }
-     private void limparTabelaSeNaoVazia() {
-        if (tabelaModel.getRowCount() > 0) {
-            int opcao = JOptionPane.showConfirmDialog(this, 
-                "Alterar cliente/fornecedor irá limpar os itens adicionados. Continuar?",
-                "Confirmação", JOptionPane.YES_NO_OPTION);
-            if (opcao == JOptionPane.YES_OPTION) {
-                tabelaModel.setRowCount(0);
-                atualizarTotais();
-            }
-        }
-    }
-
-    private void atualizarProdutosPorFornecedor() {
-        Fornecedor fornecedor = (Fornecedor) cmbFornecedor.getSelectedItem();
-        cmbProduto.removeAllItems();
-        if (fornecedor != null) {
-            List<Produto> produtos = produtoDAO.getProdutosPorFornecedor(fornecedor.getId());
-            for (Produto p : produtos) {
-                cmbProduto.addItem(p);
-            }
-            boolean habilitar = !produtos.isEmpty();
-            cmbProduto.setEnabled(habilitar);
-            spnQtd.setEnabled(habilitar);
-            btnAdicionarItem.setEnabled(habilitar);
-        }
-    }
-
-    private void atualizarProdutosParaSaida() {
-        cmbProduto.removeAllItems();
-        List<Produto> produtos = produtoDAO.getProduto();
-        for (Produto p : produtos) {
-            cmbProduto.addItem(p);
-        }
-        boolean habilitar = !produtos.isEmpty();
-        cmbProduto.setEnabled(habilitar);
-        spnQtd.setEnabled(habilitar);
-        btnAdicionarItem.setEnabled(habilitar);
-    }
-
-      private void preencherComboFornecedores() {
-        cmbFornecedor.removeAllItems();
-        for (Fornecedor f : fornecedorDAO.getFornecedor()) {
-            cmbFornecedor.addItem(f);
-        }
-    }
-
-    private void preencherComboClientes() {
-        cmbCliente.removeAllItems();
-        for (Cliente c : clienteDAO.getCliente()) {
-            cmbCliente.addItem(c);
-        }
-    }
-    private void preencherComboProdutos() {
-        cmbProduto.removeAllItems();
-        for (Produto p : produtoDAO.getProduto()) {
-            cmbProduto.addItem(p);
-        }
-    }
-    
-    private void atualizarTotais() {
-        double total = 0;
-        int qtdTotal = 0;
-
-        for (int i = 0; i < tabelaModel.getRowCount(); i++) {
-            Produto p = (Produto) tabelaModel.getValueAt(i, 0);
-            int qtd = (int) tabelaModel.getValueAt(i, 1);
-            double subtotal = (double) tabelaModel.getValueAt(i, 3);
-            total += subtotal;
-            qtdTotal += qtd;
-        }
-
-        txtTotal.setText(String.format("%.2f", total));
-        txtQtdt.setText(String.valueOf(qtdTotal));
-    }
-
-     private void limparFormulario() {
-        cmbTipo.setSelectedIndex(0);
-        txtData.setText("");
-        cmbCliente.setSelectedIndex(-1);
-        cmbFornecedor.setSelectedIndex(-1);
-        cmbProduto.setSelectedIndex(-1);
-        spnQtd.setValue(1);
-        tabelaModel.setRowCount(0);
-        atualizarTotais();
-        btnAdicionarItem.setEnabled(false);
-        btnExcluir.setEnabled(false);
-    }
-     
-     private void adicionarItem() {
-        Produto produto = (Produto) cmbProduto.getSelectedItem();
-        int quantidade = (int) spnQtd.getValue();
-
-        if (produto == null || quantidade <= 0) {
-            JOptionPane.showMessageDialog(this, "Selecione um produto e quantidade válida!");
-            return;
-        }
-
-        double subtotal = produto.getPrecoVenda() * quantidade;
-        tabelaModel.addRow(new Object[]{produto, quantidade, produto.getPrecoVenda(), subtotal});
-        atualizarTotais();
-        btnExcluir.setEnabled(true);
-    }
-     
-     public void preencherTabela(int idNota){
-        ItemNotaFiscalDAO iDAO = new ItemNotaFiscalDAO();
-        List<ItemNotaFiscal> listaItensNotaFiscal = iDAO.getItensPorNota(idNota);
-
-        tabelaModel.setRowCount(0); 
-        for (ItemNotaFiscal item : listaItensNotaFiscal) {
-            tabelaModel.addRow(new Object[]{
-                item.getPrd(),
-                item.getQuantidade(),
-                item.getPrd().getPrecoVenda(),
-                item.getSubtotal()
-            });
-        }
-
-        // Renderiza só o nome do produto
-        tblNotaFiscal.getColumnModel().getColumn(0).setCellRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public void setValue(Object value) {
-                if (value instanceof Produto) {
-                    setText(((Produto) value).getNome());
-                } else {
-                    super.setValue(value);
-                }
+            if (!e.getValueIsAdjusting() && tblNotaFiscal.getSelectedRow() != -1) {
+                btnExcluir.setEnabled(true);
             }
         });
-
-        atualizarTotais();
     }
-     
-     private void salvarNota() {
-        boolean tipoSaida = cmbTipo.getSelectedItem().toString().equalsIgnoreCase("1-Saída");
-
-        if (tipoSaida && clienteAtual == null) {
-            JOptionPane.showMessageDialog(this, "Selecione um cliente para saída.");
-            return;
-        }
-        if (!tipoSaida && fornecedorAtual == null) {
-            JOptionPane.showMessageDialog(this, "Selecione um fornecedor para entrada.");
-            return;
-        }
-         Beans.NotaFiscal nota = new Beans.NotaFiscal();
-        nota.setTipo(tipoSaida);
-        nota.setDataVenda(LocalDateTime.now());
-        nota.setQtdTotal(Integer.parseInt(txtQtdt.getText()));
-        nota.setValorTotal(Double.parseDouble(txtTotal.getText()));
-
-        if (tipoSaida) {
-            nota.setCliente(clienteAtual);
-        } else {
-            nota.setFornecedor(fornecedorAtual);
-        }
-
-        int idNota = notaDAO.inserirNotaFiscal(nota);
-        if (idNota <= 0) {
-            JOptionPane.showMessageDialog(this, "Erro ao inserir nota fiscal.");
-            return;
-        }
-        
-      ItemNotaFiscalDAO daoItem = new ItemNotaFiscalDAO();
-        for (int i = 0; i < tabelaModel.getRowCount(); i++) {
-            Produto produto = (Produto) tabelaModel.getValueAt(i, 0);
-            if (produto == null) continue;
-
-            int qtd = (int) tabelaModel.getValueAt(i, 1);
-            double precoUnit = (double) tabelaModel.getValueAt(i, 2);
-            double subtotal = (double) tabelaModel.getValueAt(i, 3);
-            
-            ItemNotaFiscal item = new ItemNotaFiscal();
-            item.setPrd(produto);
-            item.setQuantidade(qtd);
-            item.setPrecoUnidade(precoUnit);
-            item.setSubtotal(subtotal);
-            item.setNtf(nota);
-
-            int idItem = daoItem.inserirItemNotaFiscal(item);
-            if (idItem <= 0) {
-                JOptionPane.showMessageDialog(this, "Erro ao inserir um item da nota.");
-           }
-        }
-
-        JOptionPane.showMessageDialog(this, "Nota fiscal e itens inseridos com sucesso! ID: " + idNota);
-        limparFormulario();
-        preencherTabela(idNota);
-    }
-     
-     
-     
     
-  
-
     private void atualizarProximoId() {
     NotaFiscalDAO dao = new NotaFiscalDAO();
     int proximoId = dao.getNextId();
     txtCod.setText(String.valueOf(proximoId));
      }
+     
+private void configurarTipoNota() {
+    DefaultTableModel model = (DefaultTableModel) tblNotaFiscal.getModel();
+    boolean temItens = false;
+for (int i = 0; i < model.getRowCount(); i++) {
+    Object obj = model.getValueAt(i, 0);
+    if (obj instanceof Produto) {
+        temItens = true;
+        break;
+    }
+}
+if (temItens) {
+    JOptionPane.showMessageDialog(this, "Não é possível alterar o tipo da nota após adicionar itens.");
+    return;
+}
+
+    int tipo = cmbTipo.getSelectedIndex(); // 0 = Entrada, 1 = Saída
+
+    if (tipo == 0) { // Entrada
+        cmbFornecedor.setEnabled(true);
+        cmbCliente.setEnabled(false);
+
+        carregarFornecedor();
+        carregarProdutosPorFornecedor();
+
+    } else if (tipo == 1) { // Saída
+        cmbFornecedor.setEnabled(false);
+        cmbCliente.setEnabled(true);
+
+        carregarCliente();
+        carregarProdutosPorCliente();
+    }
+
+    btnAdicionarItem.setEnabled(tipo != -1);
+}
+
+
+
+   private void carregarFornecedor() {
+    cmbFornecedor.removeAllItems();
+    FornecedorDAO dao = new FornecedorDAO();
+    for (Fornecedor f : dao.getFornecedor()) {
+        cmbFornecedor.addItem(f); // adiciona o objeto
+    }
+    cmbFornecedor.setSelectedIndex(-1);
+}
+
+private void carregarCliente() {
+    cmbCliente.removeAllItems();
+    ClienteDAO dao = new ClienteDAO();
+    for (Cliente c : dao.getCliente()) {
+        cmbCliente.addItem(c); // adiciona o objeto
+    }
+    cmbCliente.setSelectedIndex(-1);
+}
+
+   private void carregarProdutosPorFornecedor() {
+    // Limpa o combo
+    cmbProduto.removeAllItems();
+
+    // Pega o fornecedor selecionado como objeto
+    Object selected = cmbFornecedor.getSelectedItem();
+    if (!(selected instanceof Fornecedor)) return; // se não for Fornecedor, sai
+    Fornecedor f = (Fornecedor) selected;
+
+    // Cria DAO e busca produtos do fornecedor
+    ProdutoDAO dao = new ProdutoDAO();
+    List<Produto> produtos = dao.getProdutosPorFornecedor(f.getId());
+
+    // Adiciona os produtos no combo
+    for (Produto p : produtos) {
+        cmbProduto.addItem(p); // usa o objeto Produto
+    }
+
+    cmbProduto.setSelectedIndex(-1);
+}
+
     
-   
-  
+
+   private void carregarProdutosPorCliente() {
+    // Limpa o combo
+    cmbProduto.removeAllItems();
+
+    // Pega o cliente selecionado como objeto
+    Object selected = cmbCliente.getSelectedItem();
+    if (!(selected instanceof Cliente)) return; // se não for Cliente, sai
+    Cliente c = (Cliente) selected;
+
+    // Cria DAO e busca todos os produtos
+    ProdutoDAO dao = new ProdutoDAO();
+    List<Produto> produtos = dao.getProduto(); // assume que esse método retorna todos
+
+    // Adiciona os produtos no combo
+    for (Produto p : produtos) {
+        cmbProduto.addItem(p); // adiciona o objeto Produto
+    }
+
+    cmbProduto.setSelectedIndex(-1);
+}
+
+
+private void adicionarItem() {
+    try {
+        Produto p = (Produto) cmbProduto.getSelectedItem();
+        if (p == null) {
+            JOptionPane.showMessageDialog(this, "Selecione um produto!");
+            return;
+        }
+
+        int qtd = (Integer) spnQtd.getValue();
+        if (qtd <= 0) {
+            JOptionPane.showMessageDialog(this, "Quantidade deve ser maior que zero!");
+            return;
+        }
+
+        DefaultTableModel model = (DefaultTableModel) tblNotaFiscal.getModel();
+
+        // Verifica se o produto já está na tabela
+        for (int i = 0; i < model.getRowCount(); i++) {
+            Object obj = model.getValueAt(i, 0);
+            if (obj instanceof Produto) {
+                Produto existente = (Produto) obj;
+                if (existente.getId() == p.getId()) {
+                    JOptionPane.showMessageDialog(this, "Produto já adicionado!");
+                    return;
+                }
+            }
+        }
+
+        double preco = p.getPrecoVenda();
+        double subtotal = qtd * preco;
+
+        model.addRow(new Object[]{p, qtd, preco, subtotal});
+        atualizarTotais();
+
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(this, "Erro ao adicionar item: " + ex.getMessage());
+        ex.printStackTrace();
+    }
+}
+
+
+
+
+    private void atualizarTotais() {
+    double total = 0;
+    int qtdTotal = 0;
+    DefaultTableModel model = (DefaultTableModel) tblNotaFiscal.getModel();
+
+    for (int i = 0; i < model.getRowCount(); i++) {
+        Object objQtd = model.getValueAt(i, 1);
+        Object objPreco = model.getValueAt(i, 2);
+
+        int qtd = (objQtd != null) ? ((Number)objQtd).intValue() : 0;
+        double preco = (objPreco != null) ? ((Number)objPreco).doubleValue() : 0;
+
+        total += qtd * preco;
+        qtdTotal += qtd;
+    }
+    txtTotal.setText(String.format("%.2f", total));
+    txtQtdt.setText(String.valueOf(qtdTotal));
+}
+
+
+private void excluirItemSelecionado() {
+    int linha = tblNotaFiscal.getSelectedRow();
+    if (linha != -1) {
+        DefaultTableModel model = (DefaultTableModel) tblNotaFiscal.getModel();
+        model.removeRow(linha);
+        atualizarTotais();
+    }
+}
+
+
+
+    private void cancelarNota() {
+        int linha = tblNotaFiscal.getSelectedRow();
+        if (linha != -1) {
+            int idNota = (int) tblNotaFiscal.getValueAt(linha, 0);
+            NotaFiscalDAO dao = new NotaFiscalDAO();
+            boolean sucesso = dao.cancelarNotaFiscal(idNota);
+            if (sucesso) {
+                JOptionPane.showMessageDialog(this, "Nota cancelada com sucesso!");
+                listarNotas();
+            } else {
+                JOptionPane.showMessageDialog(this, "Erro ao cancelar a nota!");
+            }
+        }
+    }
+
+    private void limparCampos() {
+        txtTotal.setText("");
+        txtQtdt.setText("");
+        spnQtd.setValue(1);
+        cmbCliente.setSelectedIndex(-1);
+        cmbFornecedor.setSelectedIndex(-1);
+        cmbProduto.setSelectedIndex(-1);
+        ((DefaultTableModel) tblNotaFiscal.getModel()).setRowCount(0);
+    }
+
+    private void listarNotas() {
+        DefaultTableModel model = (DefaultTableModel) tblNotaFiscal.getModel();
+        model.setRowCount(0);
+        NotaFiscalDAO dao = new NotaFiscalDAO();
+        List<Beans.NotaFiscal> notas = dao.getNotas();
+        for (Beans.NotaFiscal nota : notas) {
+            for (ItemNotaFiscal item : nota.getItens()) {
+                model.addRow(new Object[]{
+                        nota.getId(),
+                        item.getPrd().getNome(),
+                        item.getQuantidade(),
+                        item.getPrecoUnidade(),
+                        item.getSubtotal(),
+                        nota.isStatus() ? "Ativa" : "Cancelada"
+                });
+            }
+        }
+    }
+ 
+
+  private void salvarNota() {
+    try {
+        int tipo = cmbTipo.getSelectedIndex();
+        if (tipo == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione o tipo da nota!");
+            return;
+        }
+
+        Beans.NotaFiscal nota = new Beans.NotaFiscal();
+        nota.setTipo(tipo == 1); // true = saída, false = entrada
+
+        if (tipo == 1) { // Saída
+            Cliente cliente = (Cliente) cmbCliente.getSelectedItem();
+            if (cliente == null) {
+                JOptionPane.showMessageDialog(this, "Selecione um cliente!");
+                return;
+            }
+            nota.setCliente(cliente);
+        } else { // Entrada
+            Fornecedor fornecedor = (Fornecedor) cmbFornecedor.getSelectedItem();
+            if (fornecedor == null) {
+                JOptionPane.showMessageDialog(this, "Selecione um fornecedor!");
+                return;
+            }
+            nota.setFornecedor(fornecedor);
+        }
+
+        nota.setDataVenda(java.time.LocalDate.now());
+
+        // Itens da nota
+        List<ItemNotaFiscal> itens = new ArrayList<>();
+        DefaultTableModel model = (DefaultTableModel) tblNotaFiscal.getModel();
+
+        for (int i = 0; i < model.getRowCount(); i++) {
+            Object objProduto = model.getValueAt(i, 0);
+            Object objQtd = model.getValueAt(i, 1);
+            Object objPreco = model.getValueAt(i, 2);
+
+            if (!(objProduto instanceof Produto) || objQtd == null || objPreco == null) continue;
+
+            Produto p = (Produto) objProduto;
+            int qtd = ((Number) objQtd).intValue();
+            double preco = ((Number) objPreco).doubleValue();
+
+            ItemNotaFiscal item = new ItemNotaFiscal();
+            item.setPrd(p);
+            item.setQuantidade(qtd);
+            item.setPrecoUnidade(preco);
+            item.setSubtotal(preco * qtd);
+
+            itens.add(item);
+        }
+
+        if (itens.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Adicione pelo menos um item à nota!");
+            return;
+        }
+
+        nota.setItens(itens);
+        nota.setQtdTotal(itens.stream().mapToInt(ItemNotaFiscal::getQuantidade).sum());
+        nota.setValorTotal(itens.stream().mapToDouble(ItemNotaFiscal::getSubtotal).sum());
+        nota.setStatus(true); // ativa por padrão
+
+        // Salvar nota
+        NotaFiscalDAO dao = new NotaFiscalDAO();
+        int idGerado = dao.inserirNotaFiscal(nota);
+
+        if (idGerado > 0) {
+            nota.setId(idGerado); // atualiza o ID da nota original
+            ItemNotaFiscalDAO itemDao = new ItemNotaFiscalDAO();
+            for (ItemNotaFiscal item : itens) {
+                item.setNtf(nota); // vincula corretamente
+                itemDao.inserirItem(item);
+            }
+
+            JOptionPane.showMessageDialog(this, "Nota salva com sucesso! ID: " + idGerado);
+            limparCampos();
+        } else {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar a nota!");
+        }
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Erro: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
+
 
 
     @SuppressWarnings("unchecked")
@@ -316,7 +379,6 @@ public class NotaFiscal extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         tblNotaFiscal = new javax.swing.JTable();
         btnListar = new javax.swing.JButton();
-        btnCancelar = new javax.swing.JButton();
         btnSalvar = new javax.swing.JButton();
         btnLimpar = new javax.swing.JButton();
         lblTotal = new javax.swing.JLabel();
@@ -352,6 +414,7 @@ public class NotaFiscal extends javax.swing.JFrame {
 
         lblData.setText("Data");
 
+        txtData.setEditable(false);
         txtData.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(java.text.DateFormat.getDateInstance(java.text.DateFormat.SHORT))));
 
         lblTipo.setText("Tipo");
@@ -384,6 +447,11 @@ public class NotaFiscal extends javax.swing.JFrame {
         lblQtd.setText("Quantidade");
 
         cmbProduto.setModel(new javax.swing.DefaultComboBoxModel(new String[] { " " }));
+        cmbProduto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbProdutoActionPerformed(evt);
+            }
+        });
 
         lblProduto.setText("Produto");
 
@@ -431,8 +499,6 @@ public class NotaFiscal extends javax.swing.JFrame {
                 btnListarActionPerformed(evt);
             }
         });
-
-        btnCancelar.setText("Cancelar");
 
         btnSalvar.setText("Salvar");
         btnSalvar.addActionListener(new java.awt.event.ActionListener() {
@@ -567,27 +633,25 @@ public class NotaFiscal extends javax.swing.JFrame {
                 .addGap(37, 37, 37)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnSalvar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnLimpar))
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(lblQtdTotal, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtQtdt, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
-                        .addGap(12, 12, 12)))
+                        .addGap(78, 78, 78))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnSalvar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnLimpar)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(btnListar, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(28, 28, 28)
-                        .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(93, 93, 93)
+                        .addGap(27, 27, 27)
                         .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtTotal, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
-                        .addGap(12, 12, 12))))
+                        .addGap(12, 12, 12))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnListar, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(60, 60, 60))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane2)
@@ -598,7 +662,7 @@ public class NotaFiscal extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnCancelar, btnLimpar, btnListar, btnSalvar});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnLimpar, btnListar, btnSalvar});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -636,12 +700,10 @@ public class NotaFiscal extends javax.swing.JFrame {
                     .addComponent(txtQtdt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblQtdTotal))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnCancelar)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnSalvar)
-                        .addComponent(btnListar)
-                        .addComponent(btnLimpar)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSalvar)
+                    .addComponent(btnListar)
+                    .addComponent(btnLimpar))
                 .addGap(12, 12, 12))
         );
 
@@ -659,7 +721,7 @@ public class NotaFiscal extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAdicionarItemActionPerformed
 
     private void btnListarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListarActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_btnListarActionPerformed
 
     private void menPrincipalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menPrincipalActionPerformed
@@ -691,66 +753,37 @@ public class NotaFiscal extends javax.swing.JFrame {
     }//GEN-LAST:event_txtTotalActionPerformed
 
     private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
-        int linha = tblNotaFiscal.getSelectedRow();
-        if (linha >= 0) {
-            tabelaModel.removeRow(linha);
-            atualizarTotais();
-        }
-        btnExcluir.setEnabled(tabelaModel.getRowCount() > 0);
+      excluirItemSelecionado();
     }//GEN-LAST:event_btnExcluirActionPerformed
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
-            salvarNota();
-  
+          
+   salvarNota();
     }//GEN-LAST:event_btnSalvarActionPerformed
 
     private void btnLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparActionPerformed
-        limparFormulario();
+        
     }//GEN-LAST:event_btnLimparActionPerformed
 
     private void cmbTipoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbTipoActionPerformed
-      atualizarCamposPorTipo();
+      
     }//GEN-LAST:event_cmbTipoActionPerformed
 
     private void cmbFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbFornecedorActionPerformed
-    Fornecedor selecionado = (Fornecedor) cmbFornecedor.getSelectedItem();
-
-    if (selecionado != null && fornecedorAtual != null && !fornecedorAtual.equals(selecionado)) {
-        // Limpa a tabela se mudou de fornecedor
-        tabelaModel.setRowCount(0);
-        atualizarTotais();
-    }
-    fornecedorAtual = selecionado;
-    atualizarProdutosPorFornecedor();
+          carregarProdutosPorFornecedor();
     }//GEN-LAST:event_cmbFornecedorActionPerformed
 
     private void cmbClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbClienteActionPerformed
-      Cliente selecionado = (Cliente) cmbCliente.getSelectedItem();
-
-    if (selecionado != null && clienteAtual != null && !clienteAtual.equals(selecionado)) {
-
+       carregarProdutosPorCliente();
     }//GEN-LAST:event_cmbClienteActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    }    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+    private void cmbProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbProdutoActionPerformed
+      
+    }//GEN-LAST:event_cmbProdutoActionPerformed
+
+
+        public static void main(String args[]) {
+        
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new NotaFiscal().setVisible(true));
@@ -758,7 +791,6 @@ public class NotaFiscal extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdicionarItem;
-    private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnExcluir;
     private javax.swing.JButton btnLimpar;
     private javax.swing.JButton btnListar;

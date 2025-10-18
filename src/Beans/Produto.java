@@ -14,7 +14,7 @@ public class Produto {
     private String descricao;
     private double precoVenda;
     private int qtdEstoque;
-    private Fornecedor idFornecedor;
+    private Fornecedor fornecedor;
     private String codBarras;
     
     
@@ -64,19 +64,11 @@ public class Produto {
     }
 
     public Fornecedor getFornecedor() {
-        return idFornecedor;
+        return fornecedor;
     }
 
     public void setFornecedor(Fornecedor fornecedor) {
-        this.idFornecedor = fornecedor;
-    }
-
-    public Fornecedor getIdFornecedor() {
-        return idFornecedor;
-    }
-
-    public void setIdFornecedor(Fornecedor idFornecedor) {
-        this.idFornecedor = idFornecedor;
+        this.fornecedor = fornecedor;
     }
 
     public String getCodBarras() {
