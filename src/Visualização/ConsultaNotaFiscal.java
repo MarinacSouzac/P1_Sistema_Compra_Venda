@@ -46,14 +46,21 @@ public class ConsultaNotaFiscal extends javax.swing.JFrame {
     cmbID.setEnabled(true);
 }
 
- private void filtrarNotas() {
+     private void filtrarNotas() {
     NotaFiscalDAO dao = new NotaFiscalDAO();
     List<NotaFiscal> notasFiltradas = new ArrayList<>();
 
     String idTexto = (String) cmbID.getEditor().getItem();
     boolean idPreenchido = idTexto != null && !idTexto.trim().isEmpty();
-    int tipoSelecionado = cmbTipo.getSelectedIndex(); 
+    int tipoSelecionado = cmbTipo.getSelectedIndex();
 
+    // Caso nenhum tipo seja selecionado, mostra tudo
+    if (tipoSelecionado == -1) {
+        mostrarTodasNotas();
+        return;
+    }
+
+    // Se o ID foi preenchido, busca por ele
     if (idPreenchido) {
         try {
             int id = Integer.parseInt(idTexto.trim());
@@ -63,26 +70,25 @@ public class ConsultaNotaFiscal extends javax.swing.JFrame {
                 if (tipoNota == tipoSelecionado) {
                     notasFiltradas.add(nf);
                 } else {
-                    JOptionPane.showMessageDialog(this, "ID não pertence "
-                            + "ao tipo selecionado.");
-                    mostrarTodasNotas();
+                    JOptionPane.showMessageDialog(this, 
+                        "O ID informado pertence a outro tipo de nota.");
                     return;
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Nota com ID " + id + " "
-                        + "não encontrada.");
-                mostrarTodasNotas();
+                JOptionPane.showMessageDialog(this, 
+                    "Nenhuma nota encontrada com o ID informado.");
                 return;
             }
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "ID inválido.");
-            mostrarTodasNotas();
             return;
         }
     } else {
+        // Se o ID não foi informado, filtra todas pelo tipo selecionado
         notasFiltradas = dao.buscarPorTipo(tipoSelecionado);
     }
 
+    // Atualiza tabela
     DefaultTableModel model = (DefaultTableModel) tblLtNF.getModel();
     model.setRowCount(0);
 

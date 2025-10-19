@@ -1,4 +1,3 @@
-
 package Visualização;
 
 import DAO.NotaFiscalDAO;
@@ -10,17 +9,18 @@ import Beans.ItemNotaFiscal;
 import Beans.Produto;
 import Beans.Fornecedor;
 import Beans.Cliente;
+
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class NotaFiscal extends javax.swing.JFrame {
-    
-private Cliente clienteFixado = null;
-private Fornecedor fornecedorFixado = null;
 
-  
+    // Guarda o cliente ou fornecedor fixado após adicionar o primeiro item
+    private Cliente clienteFixado = null;
+    private Fornecedor fornecedorFixado = null;
+
     public NotaFiscal() {
         initComponents();
         setLocationRelativeTo(null);
@@ -29,205 +29,217 @@ private Fornecedor fornecedorFixado = null;
         txtData.setFocusable(false);
         atualizarProximoId();
         cmbTipo.setSelectedIndex(0);
-        
+
+        // Listeners de botões e combos
         cmbTipo.addActionListener(e -> configurarTipoNota());
         btnAdicionarItem.addActionListener(e -> adicionarItem());
         btnSalvar.addActionListener(e -> salvarNota());
         btnLimpar.addActionListener(e -> limparCampos());
         cmbFornecedor.addActionListener(e -> carregarProdutosPorFornecedor());
         btnExcluir.addActionListener(e -> excluirItemSelecionado());
-        
+
+        // Habilita o botão de excluir quando uma linha é selecionada
         tblNotaFiscal.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting() && tblNotaFiscal.getSelectedRow() != -1) 
-            {
+            if (!e.getValueIsAdjusting() && tblNotaFiscal.getSelectedRow() != -1) {
                 btnExcluir.setEnabled(true);
             }
         });
-        
+
         ((DefaultTableModel) tblNotaFiscal.getModel()).setRowCount(0);
-        
+
+        // Define a data atual automaticamente
         txtData.setText(
-        java.time.LocalDate.now().format
-        (java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-
+            java.time.LocalDate.now().format(
+                java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
+            )
+        );
     }
-    
+
+    // Atualiza o próximo ID da nota fiscal
     private void atualizarProximoId() {
-    NotaFiscalDAO dao = new NotaFiscalDAO();
-    int proximoId = dao.getNextId();
-    txtCod.setText(String.valueOf(proximoId));
-     }
-    
-    private void carregarFornecedor() {
-    cmbFornecedor.removeAllItems();
-    FornecedorDAO dao = new FornecedorDAO();
-    for (Fornecedor f : dao.getFornecedor()) {
-        cmbFornecedor.addItem(f); 
-    }
-    cmbFornecedor.setSelectedIndex(-1);
+        NotaFiscalDAO dao = new NotaFiscalDAO();
+        int proximoId = dao.getNextId();
+        txtCod.setText(String.valueOf(proximoId));
     }
 
+    // Carrega fornecedores no combo
+    private void carregarFornecedor() {
+        cmbFornecedor.removeAllItems();
+        FornecedorDAO dao = new FornecedorDAO();
+        for (Fornecedor f : dao.getFornecedor()) {
+            cmbFornecedor.addItem(f);
+        }
+        cmbFornecedor.setSelectedIndex(-1);
+    }
+
+    // Carrega clientes no combo
     private void carregarCliente() {
         cmbCliente.removeAllItems();
         ClienteDAO dao = new ClienteDAO();
         for (Cliente c : dao.getCliente()) {
-            cmbCliente.addItem(c); 
+            cmbCliente.addItem(c);
         }
         cmbCliente.setSelectedIndex(-1);
     }
-     
+
+    // Configura o tipo da nota (Entrada ou Saída)
     private void configurarTipoNota() {
         DefaultTableModel model = (DefaultTableModel) tblNotaFiscal.getModel();
         boolean temItens = false;
-    for (int i = 0; i < model.getRowCount(); i++) {
-        Object obj = model.getValueAt(i, 0);
-        if (obj instanceof Produto) {
-            temItens = true;
-            break;
-        }
-    }
-    if (temItens) {
-        JOptionPane.showMessageDialog(this, "Não é possível alterar o "
-                + "tipo da nota após adicionar itens.");
-        return;
-    }
 
-    int tipo = cmbTipo.getSelectedIndex(); 
-
-    if (tipo == 0) { 
-        cmbFornecedor.setEnabled(true);
-        cmbCliente.setEnabled(false);
-
-        carregarFornecedor();
-        carregarProdutosPorFornecedor();
-
-    } else if (tipo == 1) { 
-        cmbFornecedor.setEnabled(false);
-        cmbCliente.setEnabled(true);
-
-        carregarCliente();
-        carregarProdutosPorCliente();
-    }
-
-    btnAdicionarItem.setEnabled(tipo != -1);
-}
-
- 
-
-   private void carregarProdutosPorFornecedor() {
-    cmbProduto.removeAllItems();
-    Fornecedor atual = (Fornecedor) cmbFornecedor.getSelectedItem();
-    if (fornecedorFixado != null && atual != null && atual.getId() 
-            != fornecedorFixado.getId()) {
-    JOptionPane.showMessageDialog(this, "Não é permitido trocar de fornecedor "
-            + "após adicionar itens.");
-    cmbFornecedor.setSelectedItem(fornecedorFixado);
-    return;
-}
-    Object selected = cmbFornecedor.getSelectedItem();
-    if (!(selected instanceof Fornecedor)) return; 
-    Fornecedor f = (Fornecedor) selected;
-    ProdutoDAO dao = new ProdutoDAO();
-    List<Produto> produtos = dao.getProdutosPorFornecedor(f.getId());
-    for (Produto p : produtos) {
-        cmbProduto.addItem(p); 
-    }
-
-    cmbProduto.setSelectedIndex(-1);
-}
-
-   private void carregarProdutosPorCliente() {
-    cmbProduto.removeAllItems();
-    
-    Cliente atual = (Cliente) cmbCliente.getSelectedItem();
-if (clienteFixado != null && atual != null && atual.getId() != clienteFixado.getId()) {
-    JOptionPane.showMessageDialog(this, 
-            "Não é permitido trocar de cliente após adicionar itens.");
-    cmbCliente.setSelectedItem(clienteFixado);
-    return;
-}
-    Object selected = cmbCliente.getSelectedItem();
-    if (!(selected instanceof Cliente)) return; 
-    Cliente c = (Cliente) selected;
-    
-    ProdutoDAO dao = new ProdutoDAO();
-    List<Produto> produtos = dao.getProduto(); 
-
-    for (Produto p : produtos) {
-        cmbProduto.addItem(p); 
-    }
-
-    cmbProduto.setSelectedIndex(-1);
-}
-
-
-private void adicionarItem() {
-    try {
-        Produto p = (Produto) cmbProduto.getSelectedItem();
-        if (p == null) {
-            JOptionPane.showMessageDialog(this, "Selecione um produto!");
-            return;
-        }
-
-        int qtd = (Integer) spnQtd.getValue();
-        if (qtd <= 0) {
-            JOptionPane.showMessageDialog(this, "Quantidade "
-                    + "deve ser maior que zero!");
-            return;
-        }
-
-        DefaultTableModel model = (DefaultTableModel) tblNotaFiscal.getModel();
-
+        // Verifica se já existem itens na nota
         for (int i = 0; i < model.getRowCount(); i++) {
             Object obj = model.getValueAt(i, 0);
             if (obj instanceof Produto) {
-                Produto existente = (Produto) obj;
-                if (existente.getId() == p.getId()) {
-                    JOptionPane.showMessageDialog(this, "Produto já adicionado!");
-                    return;
-                }
+                temItens = true;
+                break;
             }
         }
 
-        double preco = p.getPrecoVenda();
-        double subtotal = qtd * preco;
+        // Impede mudar o tipo da nota se já houver itens
+        if (temItens) {
+            JOptionPane.showMessageDialog(this, 
+                "Não é possível alterar o tipo da nota após adicionar itens.");
+            return;
+        }
 
-        model.addRow(new Object[]{p, qtd, preco, subtotal});
-        atualizarTotais();
+        int tipo = cmbTipo.getSelectedIndex(); // 0 = Entrada, 1 = Saída
 
-    } catch (Exception ex) {
-        JOptionPane.showMessageDialog(this, "Erro ao adicionar item: " +
-                ex.getMessage());
-        ex.printStackTrace();
-    }
-    
-    if (cmbTipo.getSelectedIndex() == 1 && clienteFixado == null) {
-    clienteFixado = (Cliente) cmbCliente.getSelectedItem();
-    } else if (cmbTipo.getSelectedIndex() == 0 && fornecedorFixado == null) {
-        fornecedorFixado = (Fornecedor) cmbFornecedor.getSelectedItem();
-    }
+        if (tipo == 0) { // Entrada
+            cmbFornecedor.setEnabled(true);
+            cmbCliente.setEnabled(false);
+            carregarFornecedor();
+            carregarProdutosPorFornecedor();
+        } else if (tipo == 1) { // Saída
+            cmbFornecedor.setEnabled(false);
+            cmbCliente.setEnabled(true);
+            carregarCliente();
+            carregarProdutosPorCliente();
+        }
+
+        btnAdicionarItem.setEnabled(tipo != -1);
     }
 
+    // Carrega produtos do fornecedor selecionado
+    private void carregarProdutosPorFornecedor() {
+        cmbProduto.removeAllItems();
+        Fornecedor atual = (Fornecedor) cmbFornecedor.getSelectedItem();
+
+        // Impede troca de fornecedor após adicionar itens
+        if (fornecedorFixado != null && atual != null && atual.getId() != fornecedorFixado.getId()) {
+            JOptionPane.showMessageDialog(this, 
+                "Não é permitido trocar de fornecedor após adicionar itens.");
+            cmbFornecedor.setSelectedItem(fornecedorFixado);
+            return;
+        }
+
+        Object selected = cmbFornecedor.getSelectedItem();
+        if (!(selected instanceof Fornecedor)) return;
+
+        Fornecedor f = (Fornecedor) selected;
+        ProdutoDAO dao = new ProdutoDAO();
+        List<Produto> produtos = dao.getProdutosPorFornecedor(f.getId());
+
+        for (Produto p : produtos) {
+            cmbProduto.addItem(p);
+        }
+
+        cmbProduto.setSelectedIndex(-1);
+    }
+
+    // Carrega produtos (geral) para cliente
+    private void carregarProdutosPorCliente() {
+        cmbProduto.removeAllItems();
+        Cliente atual = (Cliente) cmbCliente.getSelectedItem();
+
+        // Impede troca de cliente após adicionar itens
+        if (clienteFixado != null && atual != null && atual.getId() != clienteFixado.getId()) {
+            JOptionPane.showMessageDialog(this, 
+                "Não é permitido trocar de cliente após adicionar itens.");
+            cmbCliente.setSelectedItem(clienteFixado);
+            return;
+        }
+
+        Object selected = cmbCliente.getSelectedItem();
+        if (!(selected instanceof Cliente)) return;
+
+        Cliente c = (Cliente) selected;
+        ProdutoDAO dao = new ProdutoDAO();
+        List<Produto> produtos = dao.getProduto();
+
+        for (Produto p : produtos) {
+            cmbProduto.addItem(p);
+        }
+
+        cmbProduto.setSelectedIndex(-1);
+    }
+
+    // Adiciona item à tabela
+    private void adicionarItem() {
+        try {
+            Produto p = (Produto) cmbProduto.getSelectedItem();
+            if (p == null) {
+                JOptionPane.showMessageDialog(this, "Selecione um produto!");
+                return;
+            }
+
+            int qtd = (Integer) spnQtd.getValue();
+            if (qtd <= 0) {
+                JOptionPane.showMessageDialog(this, "Quantidade deve ser maior que zero!");
+                return;
+            }
+
+            DefaultTableModel model = (DefaultTableModel) tblNotaFiscal.getModel();
+
+            // Verifica se o produto já foi adicionado
+            for (int i = 0; i < model.getRowCount(); i++) {
+                Object obj = model.getValueAt(i, 0);
+                if (obj instanceof Produto) {
+                    Produto existente = (Produto) obj;
+                    if (existente.getId() == p.getId()) {
+                        JOptionPane.showMessageDialog(this, "Produto já adicionado!");
+                        return;
+                    }
+                }
+            }
+
+            double preco = p.getPrecoVenda();
+            double subtotal = qtd * preco;
+
+            model.addRow(new Object[]{p, qtd, preco, subtotal});
+            atualizarTotais();
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao adicionar item: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        // Fixa cliente ou fornecedor
+        if (cmbTipo.getSelectedIndex() == 1 && clienteFixado == null) {
+            clienteFixado = (Cliente) cmbCliente.getSelectedItem();
+        } else if (cmbTipo.getSelectedIndex() == 0 && fornecedorFixado == null) {
+            fornecedorFixado = (Fornecedor) cmbFornecedor.getSelectedItem();
+        }
+    }
+
+    // Atualiza total e quantidade total
     private void atualizarTotais() {
-    double total = 0;
-    int qtdTotal = 0;
-    DefaultTableModel model = (DefaultTableModel) tblNotaFiscal.getModel();
+        double total = 0;
+        int qtdTotal = 0;
+        DefaultTableModel model = (DefaultTableModel) tblNotaFiscal.getModel();
 
-    for (int i = 0; i < model.getRowCount(); i++) {
-        Object objQtd = model.getValueAt(i, 1);
-        Object objPreco = model.getValueAt(i, 2);
+        for (int i = 0; i < model.getRowCount(); i++) {
+            int qtd = ((Number) model.getValueAt(i, 1)).intValue();
+            double preco = ((Number) model.getValueAt(i, 2)).doubleValue();
+            total += qtd * preco;
+            qtdTotal += qtd;
+        }
 
-        int qtd = (objQtd != null) ? ((Number)objQtd).intValue() : 0;
-        double preco = (objPreco != null) ? ((Number)objPreco).doubleValue() : 0;
-
-        total += qtd * preco;
-        qtdTotal += qtd;
+        txtTotal.setText(String.format("%.2f", total));
+        txtQtdt.setText(String.valueOf(qtdTotal));
     }
-    txtTotal.setText(String.format("%.2f", total));
-    txtQtdt.setText(String.valueOf(qtdTotal));
-}
 
-
+    // Exclui item selecionado
     private void excluirItemSelecionado() {
         int linha = tblNotaFiscal.getSelectedRow();
         if (linha != -1) {
@@ -237,6 +249,7 @@ private void adicionarItem() {
         }
     }
 
+    // Limpa todos os campos e tabela
     private void limparCampos() {
         txtTotal.setText("");
         txtQtdt.setText("");
@@ -249,118 +262,107 @@ private void adicionarItem() {
         fornecedorFixado = null;
     }
 
- 
- 
-
- private void salvarNota() {
-    try {
-        int tipo = cmbTipo.getSelectedIndex(); // 0 = Entrada, 1 = Saída
-        if (tipo == -1) {
-            JOptionPane.showMessageDialog(this, "Selecione o tipo da nota!");
-            return;
-        }
-
-        Beans.NotaFiscal nota = new Beans.NotaFiscal();
-        nota.setTipo(tipo == 1); // true = saída, false = entrada
-
-        if (tipo == 1) { // Saída
-            Cliente cliente = (Cliente) cmbCliente.getSelectedItem();
-            if (cliente == null) {
-                JOptionPane.showMessageDialog(this, "Selecione um cliente!");
+    // Salva a nota fiscal e seus itens
+    private void salvarNota() {
+        try {
+            int tipo = cmbTipo.getSelectedIndex(); // 0 = Entrada, 1 = Saída
+            if (tipo == -1) {
+                JOptionPane.showMessageDialog(this, "Selecione o tipo da nota!");
                 return;
             }
-            nota.setCliente(cliente);
-        } else { // Entrada
-            Fornecedor fornecedor = (Fornecedor) cmbFornecedor.getSelectedItem();
-            if (fornecedor == null) {
-                JOptionPane.showMessageDialog(this, "Selecione um fornecedor!");
-                return;
-            }
-            nota.setFornecedor(fornecedor);
-        }
 
-        nota.setDataVenda(java.time.LocalDate.now());
+            Beans.NotaFiscal nota = new Beans.NotaFiscal();
+            nota.setTipo(tipo == 1); // true = Saída, false = Entrada
 
-        // Itens da nota
-        List<ItemNotaFiscal> itens = new ArrayList<>();
-        DefaultTableModel model = (DefaultTableModel) tblNotaFiscal.getModel();
-
-        for (int i = 0; i < model.getRowCount(); i++) {
-            Object objProduto = model.getValueAt(i, 0);
-            Object objQtd = model.getValueAt(i, 1);
-            Object objPreco = model.getValueAt(i, 2);
-
-            if (!(objProduto instanceof Produto) || objQtd == null || 
-                    objPreco == null) continue;
-
-            Produto p = (Produto) objProduto;
-            int qtd = ((Number) objQtd).intValue();
-            double preco = ((Number) objPreco).doubleValue();
-
-            ItemNotaFiscal item = new ItemNotaFiscal();
-            item.setPrd(p);
-            item.setQuantidade(qtd);
-            item.setPrecoUnidade(preco);
-            item.setSubtotal(preco * qtd);
-
-            itens.add(item);
-        }
-
-        if (itens.isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                    "Adicione pelo menos um item à nota!");
-            return;
-        }
-
-      
-        ProdutoDAO produtoDAO = new ProdutoDAO();
-        if (tipo == 1) { 
-            for (ItemNotaFiscal item : itens) {
-                int estoqueAtual = produtoDAO.getEstoqueAtual
-                (item.getPrd().getId());
-                if (item.getQuantidade() > estoqueAtual) {
-                    JOptionPane.showMessageDialog(this, "Produto '" + 
-                            item.getPrd().getNome() + "' possui apenas " + 
-                            estoqueAtual + " unidades em estoque.");
+            // Define cliente ou fornecedor
+            if (tipo == 1) { // Saída
+                Cliente cliente = (Cliente) cmbCliente.getSelectedItem();
+                if (cliente == null) {
+                    JOptionPane.showMessageDialog(this, "Selecione um cliente!");
                     return;
                 }
-            }
-        }
-        nota.setItens(itens);
-        nota.setQtdTotal(itens.stream().
-                mapToInt(ItemNotaFiscal::getQuantidade).sum());
-        nota.setValorTotal(itens.stream().
-                mapToDouble(ItemNotaFiscal::getSubtotal).sum());
-        nota.setStatus(true); 
-
-        // Salvar nota
-        NotaFiscalDAO dao = new NotaFiscalDAO();
-        int idGerado = dao.inserirNotaFiscal(nota);
-
-        if (idGerado > 0) {
-            nota.setId(idGerado); // atualiza o ID da nota original
-            ItemNotaFiscalDAO itemDao = new ItemNotaFiscalDAO();
-            for (ItemNotaFiscal item : itens) {
-                item.setNtf(nota); // vincula corretamente
-                itemDao.inserirItem(item);
-
-                int ajuste = tipo == 1 ? -item.getQuantidade() : item.getQuantidade();
-                produtoDAO.atualizarEstoque(item.getPrd().getId(), ajuste);
+                nota.setCliente(cliente);
+            } else { // Entrada
+                Fornecedor fornecedor = (Fornecedor) cmbFornecedor.getSelectedItem();
+                if (fornecedor == null) {
+                    JOptionPane.showMessageDialog(this, "Selecione um fornecedor!");
+                    return;
+                }
+                nota.setFornecedor(fornecedor);
             }
 
-            JOptionPane.showMessageDialog(this, 
-                    "Nota salva com sucesso! ID: " + idGerado);
-            limparCampos();
-        } else {
-            JOptionPane.showMessageDialog(this, 
-                    "Erro ao salvar a nota!");
-        }
+            nota.setDataVenda(java.time.LocalDate.now());
 
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Erro: " + e.getMessage());
-        e.printStackTrace();
+            // Cria lista de itens
+            List<ItemNotaFiscal> itens = new ArrayList<>();
+            DefaultTableModel model = (DefaultTableModel) tblNotaFiscal.getModel();
+
+            for (int i = 0; i < model.getRowCount(); i++) {
+                Produto p = (Produto) model.getValueAt(i, 0);
+                int qtd = ((Number) model.getValueAt(i, 1)).intValue();
+                double preco = ((Number) model.getValueAt(i, 2)).doubleValue();
+
+                ItemNotaFiscal item = new ItemNotaFiscal();
+                item.setPrd(p);
+                item.setQuantidade(qtd);
+                item.setPrecoUnidade(preco);
+                item.setSubtotal(preco * qtd);
+
+                itens.add(item);
+            }
+
+            if (itens.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Adicione pelo menos um item à nota!");
+                return;
+            }
+
+            // Verifica estoque se for saída
+            ProdutoDAO produtoDAO = new ProdutoDAO();
+            if (tipo == 1) {
+                for (ItemNotaFiscal item : itens) {
+                    int estoqueAtual = produtoDAO.getEstoqueAtual(item.getPrd().getId());
+                    if (item.getQuantidade() > estoqueAtual) {
+                        JOptionPane.showMessageDialog(this,
+                            "Produto '" + item.getPrd().getNome() + 
+                            "' possui apenas " + estoqueAtual + " unidades em estoque.");
+                        return;
+                    }
+                }
+            }
+
+            // Define totais
+            nota.setItens(itens);
+            nota.setQtdTotal(itens.stream().mapToInt(ItemNotaFiscal::getQuantidade).sum());
+            nota.setValorTotal(itens.stream().mapToDouble(ItemNotaFiscal::getSubtotal).sum());
+
+            // Salva nota e itens
+            NotaFiscalDAO dao = new NotaFiscalDAO();
+            int idGerado = dao.inserirNotaFiscal(nota);
+
+            if (idGerado > 0) {
+                nota.setId(idGerado);
+                ItemNotaFiscalDAO itemDao = new ItemNotaFiscalDAO();
+
+                for (ItemNotaFiscal item : itens) {
+                    item.setNtf(nota);
+                    itemDao.inserirItem(item);
+
+                    int ajuste = tipo == 1 ? -item.getQuantidade() : item.getQuantidade();
+                    produtoDAO.atualizarEstoque(item.getPrd().getId(), ajuste);
+                }
+
+                JOptionPane.showMessageDialog(this, "Nota salva com sucesso! ID: " + idGerado);
+                limparCampos();
+            } else {
+                JOptionPane.showMessageDialog(this, "Erro ao salvar a nota!");
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Erro: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
-}
+
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -740,7 +742,7 @@ private void adicionarItem() {
     }//GEN-LAST:event_txtCodActionPerformed
 
     private void btnAdicionarItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdicionarItemActionPerformed
-         adicionarItem();
+         
     }//GEN-LAST:event_btnAdicionarItemActionPerformed
 
     private void btnListarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListarActionPerformed
@@ -778,11 +780,11 @@ private void adicionarItem() {
     }//GEN-LAST:event_txtTotalActionPerformed
 
     private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
-      excluirItemSelecionado();
+ 
     }//GEN-LAST:event_btnExcluirActionPerformed
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
-          salvarNota();
+
         
 
     }//GEN-LAST:event_btnSalvarActionPerformed
@@ -796,11 +798,11 @@ private void adicionarItem() {
     }//GEN-LAST:event_cmbTipoActionPerformed
 
     private void cmbFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbFornecedorActionPerformed
-          carregarProdutosPorFornecedor();
+         
     }//GEN-LAST:event_cmbFornecedorActionPerformed
 
     private void cmbClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbClienteActionPerformed
-       carregarProdutosPorCliente();
+  
     }//GEN-LAST:event_cmbClienteActionPerformed
 
     private void cmbProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbProdutoActionPerformed
