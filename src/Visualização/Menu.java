@@ -38,7 +38,7 @@ public class Menu extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(255, 204, 255));
+        jPanel1.setBackground(new java.awt.Color(0, 102, 102));
 
         btnCadCliente.setBackground(new java.awt.Color(204, 204, 204));
         btnCadCliente.setFont(new java.awt.Font("Segoe UI Semibold", 1, 12)); // NOI18N
@@ -82,7 +82,7 @@ public class Menu extends javax.swing.JFrame {
 
         jLabel1.setBackground(new java.awt.Color(255, 153, 153));
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Sistema: Compra & Venda");
 
         btnLNF.setBackground(new java.awt.Color(204, 204, 204));
@@ -110,9 +110,9 @@ public class Menu extends javax.swing.JFrame {
                             .addComponent(btnNF, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnLNF)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(75, 75, 75)
+                        .addGap(77, 77, 77)
                         .addComponent(jLabel1)))
-                .addContainerGap(103, Short.MAX_VALUE))
+                .addContainerGap(101, Short.MAX_VALUE))
         );
 
         jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnLNF, btnNF});

@@ -227,6 +227,46 @@ public Produto buscarPorNome(String nome) {
     }
     return null;
 }
+
+public boolean temNotaFiscalVinculada(int idProduto) {
+    String sql = "SELECT COUNT(*) FROM itemNotaFiscal WHERE prd_id = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, idProduto);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1) > 0;
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+
+public int getEstoqueAtual(int idProduto) {
+    String sql = "SELECT prd_qtd_estoque FROM produto WHERE prd_id = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, idProduto);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt("prd_qtd_estoque");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+public void atualizarEstoque(int idProduto, int ajuste) {
+    String sql = "UPDATE produto SET prd_qtd_estoque = prd_qtd_estoque + ? WHERE prd_id = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, ajuste);
+        stmt.setInt(2, idProduto);
+        stmt.executeUpdate();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+
 }
 
         

@@ -177,6 +177,20 @@ public class ClienteDAO {
             System.out.println("Erro ao excluir cliente: " + ex.getMessage());
         }
     }
+    
+    public boolean temNotaFiscalVinculada(int idCliente) {
+    String sql = "SELECT COUNT(*) FROM notaFiscal WHERE cli_id = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, idCliente);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1) > 0;
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
 
 }
 

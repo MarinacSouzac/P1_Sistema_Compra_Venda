@@ -709,35 +709,41 @@ public class Fornecedor extends javax.swing.JFrame {
     }//GEN-LAST:event_btnListarActionPerformed
 
     private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
-        int linhaSelecionada = tblFornecedor.getSelectedRow();
+                                               
+    int linhaSelecionada = tblFornecedor.getSelectedRow();
 
     if (linhaSelecionada >= 0) {
         DefaultTableModel modelo = (DefaultTableModel) tblFornecedor.getModel();
         int id = (int) modelo.getValueAt(linhaSelecionada, 0); // pega o ID da linha selecionada
 
+        FornecedorDAO dao = new FornecedorDAO();
+
+        // Verifica vínculo com nota fiscal
+        if (dao.temNotaFiscalVinculada(id)) {
+            JOptionPane.showMessageDialog(this, "Este fornecedor está vinculado a uma nota fiscal e não pode ser excluído.");
+            return;
+        }
+
         // Confirmação antes de excluir
         int opcao = JOptionPane.showConfirmDialog(this, 
-            "Deseja realmente excluir este cliente?", 
+            "Deseja realmente excluir este fornecedor?", 
             "Confirmação", 
             JOptionPane.YES_NO_OPTION);
 
         if (opcao == JOptionPane.YES_OPTION) {
-            // Cria um objeto Cliente com o ID
-            Beans.Fornecedor fornecedor= new Beans.Fornecedor();
+            Beans.Fornecedor fornecedor = new Beans.Fornecedor();
             fornecedor.setId(id);
 
-            // Chama o DAO para excluir
-            FornecedorDAO dao = new FornecedorDAO();
-            dao.excluirFornecedor(fornecedor); // método void que você já ajustou
-
-            // Remove a linha da tabela
+            dao.excluirFornecedor(fornecedor); 
             modelo.removeRow(linhaSelecionada);
 
-            JOptionPane.showMessageDialog(this, "Cliente excluído com sucesso!");
+            JOptionPane.showMessageDialog(this, "Fornecedor excluído com sucesso!");
         }
     } else {
-        JOptionPane.showMessageDialog(this, "Selecione um cliente na tabela para excluir!");
+        JOptionPane.showMessageDialog(this, "Selecione um fornecedor na tabela para excluir!");
     }
+
+
     }//GEN-LAST:event_btnExcluirActionPerformed
 
     private void menLNFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menLNFActionPerformed

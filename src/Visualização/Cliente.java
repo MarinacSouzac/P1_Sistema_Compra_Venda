@@ -189,6 +189,7 @@ private void setCnpjMask() {
         jMenuItem1.setText("jMenuItem1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(204, 204, 255));
         setName("cliente"); // NOI18N
         setResizable(false);
 
@@ -771,36 +772,39 @@ private void setCnpjMask() {
     }//GEN-LAST:event_btnListarActionPerformed
 
     private void bnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bnExcluirActionPerformed
-          int linhaSelecionada = tblCli.getSelectedRow();
+         int linhaSelecionada = tblCli.getSelectedRow();
 
-    if (linhaSelecionada >= 0) {
-        DefaultTableModel modelo = (DefaultTableModel) tblCli.getModel();
-        int id = (int) modelo.getValueAt(linhaSelecionada, 0);
+if (linhaSelecionada >= 0) {
+    DefaultTableModel modelo = (DefaultTableModel) tblCli.getModel();
+    int id = (int) modelo.getValueAt(linhaSelecionada, 0);
 
-        // Confirmação antes de excluir
-        int opcao = JOptionPane.showConfirmDialog(this, 
-            "Deseja realmente excluir este cliente?", 
-            "Confirmação", 
-            JOptionPane.YES_NO_OPTION);
+    ClienteDAO dao = new ClienteDAO();
 
-        if (opcao == JOptionPane.YES_OPTION) {
-            // Cria um objeto Cliente com o ID
-            Beans.Cliente cliente = new Beans.Cliente();
-            cliente.setId(id);
-
-            // Chama o DAO para excluir
-            ClienteDAO dao = new ClienteDAO();
-            dao.excluirCliente(cliente); 
-
-            // Remove a linha da tabela
-            modelo.removeRow(linhaSelecionada);
-
-            JOptionPane.showMessageDialog(this, "Cliente excluído com sucesso!");
-        }
-    } else {
-        JOptionPane.showMessageDialog(this, "Selecione um cliente na "
-                + "tabela para excluir!");
+    // Verifica vínculo com nota fiscal
+    if (dao.temNotaFiscalVinculada(id)) {
+        JOptionPane.showMessageDialog(this, "Este cliente está vinculado a uma nota fiscal e não pode ser excluído.");
+        return;
     }
+
+    // Confirmação antes de excluir
+    int opcao = JOptionPane.showConfirmDialog(this, 
+        "Deseja realmente excluir este cliente?", 
+        "Confirmação", 
+        JOptionPane.YES_NO_OPTION);
+
+    if (opcao == JOptionPane.YES_OPTION) {
+        Beans.Cliente cliente = new Beans.Cliente();
+        cliente.setId(id);
+
+        dao.excluirCliente(cliente); 
+        modelo.removeRow(linhaSelecionada);
+
+        JOptionPane.showMessageDialog(this, "Cliente excluído com sucesso!");
+    }
+} else {
+    JOptionPane.showMessageDialog(this, "Selecione um cliente na tabela para excluir!");
+}
+
     }//GEN-LAST:event_bnExcluirActionPerformed
 
     private void txtCodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCodActionPerformed

@@ -115,7 +115,6 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
         lblFornecedor = new javax.swing.JLabel();
         cmbFornecedor = new javax.swing.JComboBox();
         btnListar = new javax.swing.JButton();
-        btnCancelar = new javax.swing.JButton();
         btnSalvar = new javax.swing.JButton();
         btnLimpar = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -167,8 +166,6 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
                 btnListarActionPerformed(evt);
             }
         });
-
-        btnCancelar.setText("Cancelar");
 
         btnSalvar.setText("Salvar");
         btnSalvar.addActionListener(new java.awt.event.ActionListener() {
@@ -302,26 +299,25 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblPreco)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(btnSalvar)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnLimpar)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnListar, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(26, 26, 26)
-                                .addComponent(btnCancelar, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(lblFornecedor)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(cmbFornecedor, 0, 159, Short.MAX_VALUE)
-                                        .addComponent(lblQtdEstoque)
-                                        .addComponent(txtQtdEstoque)))
-                                .addGap(24, 24, 24))))
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(btnListar, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(cmbFornecedor, 0, 159, Short.MAX_VALUE)
+                                            .addComponent(lblQtdEstoque)
+                                            .addComponent(txtQtdEstoque))))
+                                .addGap(24, 24, 24))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(lblPreco, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(btnSalvar)
+                                        .addGap(92, 92, 92)
+                                        .addComponent(btnLimpar)))
+                                .addGap(0, 0, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(131, 131, 131)
                         .addComponent(lblTitulo)
@@ -331,7 +327,7 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -394,8 +390,7 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnSalvar)
                             .addComponent(btnLimpar)
-                            .addComponent(btnListar)
-                            .addComponent(btnCancelar))
+                            .addComponent(btnListar))
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -557,35 +552,39 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
     }//GEN-LAST:event_btnLimparActionPerformed
 
     private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
-      int linhaSelecionada = tblProduto.getSelectedRow();
+     int linhaSelecionada = tblProduto.getSelectedRow();
 
-    if (linhaSelecionada >= 0) {
-        DefaultTableModel modelo = (DefaultTableModel) tblProduto.getModel();
-        int id = (int) modelo.getValueAt(linhaSelecionada, 0); // pega o ID da linha selecionada
+if (linhaSelecionada >= 0) {
+    DefaultTableModel modelo = (DefaultTableModel) tblProduto.getModel();
+    int id = (int) modelo.getValueAt(linhaSelecionada, 0); // pega o ID da linha selecionada
 
-        // Confirmação antes de excluir
-        int opcao = JOptionPane.showConfirmDialog(this, 
-            "Deseja realmente excluir este cliente?", 
-            "Confirmação", 
-            JOptionPane.YES_NO_OPTION);
+    ProdutoDAO dao = new ProdutoDAO();
 
-        if (opcao == JOptionPane.YES_OPTION) {
-            // Cria um objeto Cliente com o ID
-            Beans.Fornecedor fornecedor= new Beans.Fornecedor();
-            fornecedor.setId(id);
+    // Verifica vínculo com nota fiscal
+    if (dao.temNotaFiscalVinculada(id)) {
+        JOptionPane.showMessageDialog(this, "Este produto está vinculado a uma nota fiscal e não pode ser excluído.");
+        return;
+    }
 
-            // Chama o DAO para excluir
-            FornecedorDAO dao = new FornecedorDAO();
-            dao.excluirFornecedor(fornecedor); 
+    // Confirmação antes de excluir
+    int opcao = JOptionPane.showConfirmDialog(this, 
+        "Deseja realmente excluir este produto?", 
+        "Confirmação", 
+        JOptionPane.YES_NO_OPTION);
 
-            // Remove a linha da tabela
-            modelo.removeRow(linhaSelecionada);
+    if (opcao == JOptionPane.YES_OPTION) {
+        Beans.Produto produto = new Beans.Produto();
+        produto.setId(id);
 
-            JOptionPane.showMessageDialog(this, "Cliente excluído com sucesso!");
-        }
-    } else {
-        JOptionPane.showMessageDialog(this, "Selecione um cliente na tabela para excluir!");
-    }  
+        dao.excluirProduto(produto); 
+        modelo.removeRow(linhaSelecionada);
+
+        JOptionPane.showMessageDialog(this, "Produto excluído com sucesso!");
+    }
+} else {
+    JOptionPane.showMessageDialog(this, "Selecione um produto na tabela para excluir!");
+}
+
     }//GEN-LAST:event_btnExcluirActionPerformed
 
     private void txtPrecoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPrecoActionPerformed
@@ -624,7 +623,6 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnExcluir;
     private javax.swing.JButton btnLimpar;

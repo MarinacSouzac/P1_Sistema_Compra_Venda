@@ -183,5 +183,19 @@ public class FornecedorDAO {
                         ex.getMessage());
             }
         }
+    
+    public boolean temNotaFiscalVinculada(int idFornecedor) {
+    String sql = "SELECT COUNT(*) FROM notaFiscal WHERE fnc_id = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, idFornecedor);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1) > 0;
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
 
     }//fim da classe

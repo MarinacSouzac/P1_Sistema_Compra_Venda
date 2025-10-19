@@ -16,7 +16,9 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class NotaFiscal extends javax.swing.JFrame {
-
+    
+private Cliente clienteFixado = null;
+private Fornecedor fornecedorFixado = null;
 
   
     public NotaFiscal() {
@@ -26,7 +28,7 @@ public class NotaFiscal extends javax.swing.JFrame {
         txtCod.setFocusable(false);
         txtData.setFocusable(false);
         atualizarProximoId();
-        
+        cmbTipo.setSelectedIndex(0);
            // --- Eventos ---
         cmbTipo.addActionListener(e -> configurarTipoNota());
         btnAdicionarItem.addActionListener(e -> adicionarItem());
@@ -34,7 +36,7 @@ public class NotaFiscal extends javax.swing.JFrame {
         btnLimpar.addActionListener(e -> limparCampos());
         cmbFornecedor.addActionListener(e -> carregarProdutosPorFornecedor());
         btnExcluir.addActionListener(e -> excluirItemSelecionado());
-
+        
         tblNotaFiscal.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tblNotaFiscal.getSelectedRow() != -1) {
                 btnExcluir.setEnabled(true);
@@ -111,6 +113,14 @@ private void carregarCliente() {
    private void carregarProdutosPorFornecedor() {
     // Limpa o combo
     cmbProduto.removeAllItems();
+    
+    Fornecedor atual = (Fornecedor) cmbFornecedor.getSelectedItem();
+if (fornecedorFixado != null && atual != null && atual.getId() != fornecedorFixado.getId()) {
+    JOptionPane.showMessageDialog(this, "Não é permitido trocar de fornecedor após adicionar itens.");
+    cmbFornecedor.setSelectedItem(fornecedorFixado);
+    return;
+}
+
 
     // Pega o fornecedor selecionado como objeto
     Object selected = cmbFornecedor.getSelectedItem();
@@ -134,6 +144,13 @@ private void carregarCliente() {
    private void carregarProdutosPorCliente() {
     // Limpa o combo
     cmbProduto.removeAllItems();
+    
+    Cliente atual = (Cliente) cmbCliente.getSelectedItem();
+if (clienteFixado != null && atual != null && atual.getId() != clienteFixado.getId()) {
+    JOptionPane.showMessageDialog(this, "Não é permitido trocar de cliente após adicionar itens.");
+    cmbCliente.setSelectedItem(clienteFixado);
+    return;
+}
 
     // Pega o cliente selecionado como objeto
     Object selected = cmbCliente.getSelectedItem();
@@ -191,6 +208,12 @@ private void adicionarItem() {
         JOptionPane.showMessageDialog(this, "Erro ao adicionar item: " + ex.getMessage());
         ex.printStackTrace();
     }
+    
+    if (cmbTipo.getSelectedIndex() == 1 && clienteFixado == null) {
+    clienteFixado = (Cliente) cmbCliente.getSelectedItem();
+} else if (cmbTipo.getSelectedIndex() == 0 && fornecedorFixado == null) {
+    fornecedorFixado = (Fornecedor) cmbFornecedor.getSelectedItem();
+}
 }
 
 
@@ -250,6 +273,8 @@ private void excluirItemSelecionado() {
         cmbFornecedor.setSelectedIndex(-1);
         cmbProduto.setSelectedIndex(-1);
         ((DefaultTableModel) tblNotaFiscal.getModel()).setRowCount(0);
+        clienteFixado = null;
+        fornecedorFixado = null;
     }
 
     private void listarNotas() {
@@ -272,9 +297,9 @@ private void excluirItemSelecionado() {
     }
  
 
-  private void salvarNota() {
+ private void salvarNota() {
     try {
-        int tipo = cmbTipo.getSelectedIndex();
+        int tipo = cmbTipo.getSelectedIndex(); // 0 = Entrada, 1 = Saída
         if (tipo == -1) {
             JOptionPane.showMessageDialog(this, "Selecione o tipo da nota!");
             return;
@@ -330,6 +355,18 @@ private void excluirItemSelecionado() {
             return;
         }
 
+        // ✅ Verificação de estoque antes de salvar
+        ProdutoDAO produtoDAO = new ProdutoDAO();
+        if (tipo == 1) { // Saída
+            for (ItemNotaFiscal item : itens) {
+                int estoqueAtual = produtoDAO.getEstoqueAtual(item.getPrd().getId());
+                if (item.getQuantidade() > estoqueAtual) {
+                    JOptionPane.showMessageDialog(this, "Produto '" + item.getPrd().getNome() + "' possui apenas " + estoqueAtual + " unidades em estoque.");
+                    return;
+                }
+            }
+        }
+
         nota.setItens(itens);
         nota.setQtdTotal(itens.stream().mapToInt(ItemNotaFiscal::getQuantidade).sum());
         nota.setValorTotal(itens.stream().mapToDouble(ItemNotaFiscal::getSubtotal).sum());
@@ -345,6 +382,10 @@ private void excluirItemSelecionado() {
             for (ItemNotaFiscal item : itens) {
                 item.setNtf(nota); // vincula corretamente
                 itemDao.inserirItem(item);
+
+                // ✅ Atualiza estoque
+                int ajuste = tipo == 1 ? -item.getQuantidade() : item.getQuantidade();
+                produtoDAO.atualizarEstoque(item.getPrd().getId(), ajuste);
             }
 
             JOptionPane.showMessageDialog(this, "Nota salva com sucesso! ID: " + idGerado);
