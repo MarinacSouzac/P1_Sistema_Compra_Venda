@@ -19,10 +19,12 @@ public class ItemNotaFiscalDAO {
     }
 
     public int inserirItem(ItemNotaFiscal item) {
-        String sql = "INSERT INTO itemNotaFiscal (ntf_id, prd_id, inf_quantidade, inf_preco_unidade, inf_subtotal) "
+        String sql = "INSERT INTO itemNotaFiscal (ntf_id, prd_id, "
+                + "inf_quantidade, inf_preco_unidade, inf_subtotal) "
                    + "VALUES (?, ?, ?, ?, ?)";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = conn.prepareStatement(
+                sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, item.getNtf().getId());
             stmt.setInt(2, item.getPrd().getId());
             stmt.setInt(3, item.getQuantidade());
@@ -45,8 +47,10 @@ public class ItemNotaFiscalDAO {
 
     public List<ItemNotaFiscal> getItensPorNota(int idNota) {
         List<ItemNotaFiscal> lista = new ArrayList<>();
-        String sql = "SELECT i.*, p.prd_nome, p.prd_preco_venda FROM itemNotaFiscal i "
-                   + "LEFT JOIN produto p ON i.prd_id = p.prd_id WHERE i.ntf_id = ?";
+        String sql = "SELECT i.*, p.prd_nome, p.prd_preco_venda "
+                + "FROM itemNotaFiscal i "
+                   + "LEFT JOIN produto p ON i.prd_id = p.prd_id "
+                + "WHERE i.ntf_id = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idNota);

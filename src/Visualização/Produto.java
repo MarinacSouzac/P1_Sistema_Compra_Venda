@@ -7,12 +7,13 @@ import Beans.Fornecedor;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.JComboBox;
+
 
 
 public class Produto extends javax.swing.JFrame {
 private boolean edicaoAtiva=false;    
-private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Produto.class.getName());
+private static final java.util.logging.Logger logger = 
+        java.util.logging.Logger.getLogger(Produto.class.getName());
     public Produto() {
         initComponents();
         setLocationRelativeTo(null);

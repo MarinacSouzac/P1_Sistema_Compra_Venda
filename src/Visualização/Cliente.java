@@ -1,22 +1,15 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package Visualização;
 
 import DAO.ClienteDAO;
 import java.text.ParseException;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author Marina Souza
- */
+
 public class Cliente extends javax.swing.JFrame {
    private boolean edicaoAtiva = false;
    private static final java.util.logging.Logger logger = 
@@ -38,11 +31,9 @@ public class Cliente extends javax.swing.JFrame {
         int linha = tblCli.getSelectedRow();
         btnEditar.setEnabled(linha >= 0);
         bnExcluir.setEnabled(linha >= 0);
-    }
-});
-       
+     }
+     });
        ((DefaultTableModel) tblCli.getModel()).setRowCount(0);
-
         getContentPane().addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -54,6 +45,7 @@ public class Cliente extends javax.swing.JFrame {
         });
       
     }
+    
     private void atualizarProximoId() {
     ClienteDAO dao = new ClienteDAO();
     int proximoId = dao.getNextId();
@@ -713,11 +705,11 @@ private void setCnpjMask() {
     
     boolean sucesso = false;
 
-    // 🔹 Verifica se estamos no modo edição
+
     
 
     if (!edicaoAtiva) {
-        // INSERIR
+    
         int idGerado = dao.inserirCliente(cliente);
         sucesso = (idGerado != -1);
 
@@ -772,21 +764,21 @@ private void setCnpjMask() {
     }//GEN-LAST:event_btnListarActionPerformed
 
     private void bnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bnExcluirActionPerformed
-         int linhaSelecionada = tblCli.getSelectedRow();
+    int linhaSelecionada = tblCli.getSelectedRow();
 
-if (linhaSelecionada >= 0) {
+    if (linhaSelecionada >= 0) {
     DefaultTableModel modelo = (DefaultTableModel) tblCli.getModel();
     int id = (int) modelo.getValueAt(linhaSelecionada, 0);
 
     ClienteDAO dao = new ClienteDAO();
 
-    // Verifica vínculo com nota fiscal
+    
     if (dao.temNotaFiscalVinculada(id)) {
-        JOptionPane.showMessageDialog(this, "Este cliente está vinculado a uma nota fiscal e não pode ser excluído.");
+        JOptionPane.showMessageDialog(this, "Este cliente está vinculado "
+                + "a uma nota fiscal e não pode ser excluído.");
         return;
     }
 
-    // Confirmação antes de excluir
     int opcao = JOptionPane.showConfirmDialog(this, 
         "Deseja realmente excluir este cliente?", 
         "Confirmação", 
@@ -801,9 +793,10 @@ if (linhaSelecionada >= 0) {
 
         JOptionPane.showMessageDialog(this, "Cliente excluído com sucesso!");
     }
-} else {
-    JOptionPane.showMessageDialog(this, "Selecione um cliente na tabela para excluir!");
-}
+    } else {
+        JOptionPane.showMessageDialog(this, "Selecione um cliente na tabela "
+                + "para excluir!");
+    }
 
     }//GEN-LAST:event_bnExcluirActionPerformed
 

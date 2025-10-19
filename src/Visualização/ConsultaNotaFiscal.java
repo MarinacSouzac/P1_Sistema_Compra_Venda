@@ -13,35 +13,31 @@ import java.time.format.DateTimeFormatter;
 public class ConsultaNotaFiscal extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = 
-            java.util.logging.Logger.getLogger(ConsultaNotaFiscal.class.getName());
-
-            
+    java.util.logging.Logger.getLogger(ConsultaNotaFiscal.class.getName());     
 
     public ConsultaNotaFiscal() {
-        initComponents();
+     initComponents();
+     mostrarTodasNotas();
+     setLocationRelativeTo(null);
+     cmbID.setEnabled(false);
+     cmbTipo.addActionListener(e -> {
+        cmbID.setEnabled(true); 
+        atualizarIDsPorTipo();  
+     });
+     btnBuscar.addActionListener(e -> filtrarNotas());
+     btnLimpar.addActionListener(e -> {
+        cmbTipo.setSelectedIndex(-1);
+        cmbID.setSelectedItem("");
+        cmbID.setEnabled(false);
         mostrarTodasNotas();
-        setLocationRelativeTo(null);
-      cmbID.setEnabled(false);
-      cmbTipo.addActionListener(e -> {
-        cmbID.setEnabled(true); // desbloqueia ao selecionar tipo
-        atualizarIDsPorTipo();  // atualiza os IDs disponíveis
-    });
-      btnBuscar.addActionListener(e -> filtrarNotas());
-      btnLimpar.addActionListener(e -> {
-    cmbTipo.setSelectedIndex(-1);
-    cmbID.setSelectedItem("");
-    cmbID.setEnabled(false);
-    mostrarTodasNotas();
-});
+     });
         
     }
     
-
  private void atualizarIDsPorTipo() {
-    int tipo = cmbTipo.getSelectedIndex(); // 0 = Entrada, 1 = Saída
+    int tipo = cmbTipo.getSelectedIndex(); 
     NotaFiscalDAO dao = new NotaFiscalDAO();
     List<NotaFiscal> notas = dao.buscarPorTipo(tipo);
-
     cmbID.removeAllItems();
     for (NotaFiscal nf : notas) {
         cmbID.addItem(String.valueOf(nf.getId()));
@@ -56,7 +52,7 @@ public class ConsultaNotaFiscal extends javax.swing.JFrame {
 
     String idTexto = (String) cmbID.getEditor().getItem();
     boolean idPreenchido = idTexto != null && !idTexto.trim().isEmpty();
-    int tipoSelecionado = cmbTipo.getSelectedIndex(); // 0 = Entrada, 1 = Saída
+    int tipoSelecionado = cmbTipo.getSelectedIndex(); 
 
     if (idPreenchido) {
         try {
@@ -67,12 +63,14 @@ public class ConsultaNotaFiscal extends javax.swing.JFrame {
                 if (tipoNota == tipoSelecionado) {
                     notasFiltradas.add(nf);
                 } else {
-                    JOptionPane.showMessageDialog(this, "ID não pertence ao tipo selecionado.");
+                    JOptionPane.showMessageDialog(this, "ID não pertence "
+                            + "ao tipo selecionado.");
                     mostrarTodasNotas();
                     return;
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Nota com ID " + id + " não encontrada.");
+                JOptionPane.showMessageDialog(this, "Nota com ID " + id + " "
+                        + "não encontrada.");
                 mostrarTodasNotas();
                 return;
             }
@@ -121,34 +119,7 @@ private void mostrarTodasNotas() {
     }
 }
 
-  private void filtrarPorIDSelecionado() {
-    String idTexto = (String) cmbID.getSelectedItem();
-    if (idTexto != null && !idTexto.trim().isEmpty()) {
-        try {
-            int id = Integer.parseInt(idTexto.trim());
-            NotaFiscalDAO dao = new NotaFiscalDAO();
-            NotaFiscal nf = dao.buscarPorId(id);
-            if (nf != null && (nf.isTipo() ? 1 : 0) == cmbTipo.getSelectedIndex()) {
-                DefaultTableModel model = (DefaultTableModel) tblLtNF.getModel();
-                model.setRowCount(0);
-                model.addRow(new Object[]{
-                    nf.getId(),
-                    nf.isTipo() ? "Saída" : "Entrada",
-                    nf.getFornecedor() != null ? nf.getFornecedor().getNome() : "-",
-                    nf.getCliente() != null ? nf.getCliente().getNome() : "-",
-                    nf.getDataVenda().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                    nf.getQtdTotal(),
-                    nf.getValorTotal()
-                });
-            } else {
-                JOptionPane.showMessageDialog(this, "ID não pertence ao tipo selecionado.");
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "ID inválido.");
-        }
-    }
-}
-  
+ 
     
 
     @SuppressWarnings("unchecked")

@@ -3,7 +3,6 @@ package DAO;
 import Beans.NotaFiscal;
 import Beans.Cliente;
 import Beans.Fornecedor;
-import Beans.ItemNotaFiscal;
 import Conexao.Conexao;
 import java.sql.*;
 import java.util.ArrayList;
@@ -20,34 +19,39 @@ public class NotaFiscalDAO {
     }
 
     public int inserirNotaFiscal(NotaFiscal nota) {
-        String sql = "INSERT INTO notaFiscal (ntf_data_venda, ntf_tipo, ntf_quant_vend, ntf_valor_total, cli_id, fnc_id) "
+        String sql = "INSERT INTO notaFiscal (ntf_data_venda, ntf_tipo, "
+                + "ntf_quant_vend, ntf_valor_total, cli_id, fnc_id) "
                    + "VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = conn.prepareStatement(
+                sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setDate(1, Date.valueOf(nota.getDataVenda()));
             stmt.setInt(2, nota.isTipo() ? 1 : 0);
             stmt.setInt(3, nota.getQtdTotal());
             stmt.setDouble(4, nota.getValorTotal());
 
             if (nota.isTipo()) {
-                stmt.setInt(5, nota.getCliente() != null ? nota.getCliente().getId() : Types.NULL);
+                stmt.setInt(5, nota.getCliente() != null ? 
+                        nota.getCliente().getId() : Types.NULL);
                 stmt.setNull(6, Types.INTEGER);
             } else {
                 stmt.setNull(5, Types.INTEGER);
-                stmt.setInt(6, nota.getFornecedor() != null ? nota.getFornecedor().getId() : Types.NULL);
+                stmt.setInt(6, nota.getFornecedor() != null ? 
+                        nota.getFornecedor().getId() : Types.NULL);
             }
-
-
             int linhas = stmt.executeUpdate();
-            if (linhas == 0) throw new SQLException("Falha ao inserir nota fiscal.");
+            if (linhas == 0) throw new SQLException
+             ("Falha ao inserir nota fiscal.");
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) return rs.getInt(1);
-                else throw new SQLException("Falha ao obter ID da nota fiscal.");
+                else throw new SQLException
+               ("Falha ao obter ID da nota fiscal.");
             }
 
         } catch (SQLException ex) {
-            System.out.println("Erro ao inserir nota fiscal: " + ex.getMessage());
+            System.out.println
+           ("Erro ao inserir nota fiscal: " + ex.getMessage());
             return -1;
         }
     }
@@ -56,7 +60,6 @@ public class NotaFiscalDAO {
         int nextId = 1;
         String sql = "SELECT COALESCE(MAX(ntf_id), 0) + "
                 + "1 AS nextId FROM notaFiscal";
-
         try {
             PreparedStatement ps = this.conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
@@ -64,23 +67,12 @@ public class NotaFiscalDAO {
             if (rs.next()) {
                 nextId = rs.getInt("nextId");
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return nextId;
     }
-    public boolean cancelarNotaFiscal(int idNota) {
-        String sql = "UPDATE notaFiscal SET ntf_status = 0 WHERE ntf_id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, idNota);
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException ex) {
-            System.out.println("Erro ao cancelar nota: " + ex.getMessage());
-            return false;
-        }
-    }
+ 
 
     public List<NotaFiscal> getNotas() {
         List<NotaFiscal> lista = new ArrayList<>();
@@ -114,7 +106,8 @@ public class NotaFiscalDAO {
             }
 
         } catch (SQLException ex) {
-            System.out.println("Erro ao consultar notas fiscais: " + ex.getMessage());
+            System.out.println("Erro ao consultar notas fiscais: " + 
+                    ex.getMessage());
         }
 
         return lista;
@@ -139,7 +132,6 @@ public class NotaFiscalDAO {
             n.setQtdTotal(rs.getInt("ntf_quant_vend"));
             n.setValorTotal(rs.getDouble("ntf_valor_total"));
     
-
             Cliente c = new Cliente();
             c.setId(rs.getInt("cli_id"));
             c.setNome(rs.getString("cli_nome"));
@@ -154,7 +146,8 @@ public class NotaFiscalDAO {
         }
 
     } catch (SQLException ex) {
-        System.out.println("Erro ao buscar notas fiscais por tipo: " + ex.getMessage());
+        System.out.println("Erro ao buscar notas fiscais por tipo: " + 
+                ex.getMessage());
     }
 
     return lista;

@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package Visualização;
 
 
@@ -11,14 +8,11 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 
-/**
- *
- * @author Marina Souza
- */
 public class Fornecedor extends javax.swing.JFrame {
     private boolean edicaoAtiva=false;
     private static final java.util.logging.Logger 
-            logger = java.util.logging.Logger.getLogger(Fornecedor.class.getName());
+            logger = java.util.logging.Logger.getLogger
+            (Fornecedor.class.getName());
 
     public Fornecedor() {
         initComponents();
@@ -39,71 +33,68 @@ public class Fornecedor extends javax.swing.JFrame {
 });
         ((DefaultTableModel) tblFornecedor.getModel()).setRowCount(0);
 
-// Adiciona listener no painel principal (ou frame) para clicar fora da tabela
+
         getContentPane().addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
-                // Limpa seleção da tabela
+                
                 tblFornecedor.clearSelection();
                 btnEditar.setEnabled(false);
                 btnExcluir.setEnabled(false);
             }
-        });
-
-        
-        
+        });          
     }
-        
-    
+
         private void atualizarProximoId() {
             FornecedorDAO dao = new FornecedorDAO();
             int proximoId = dao.getNextId();
             txtCod.setText(String.valueOf(proximoId));
              }
     
-      private void limparFormulario(){
-        txtNome.setText("");
-        txtNomeFt.setText("");
-        txtCnpj.setText("");
-        txtEmail.setText("");
-        txtTelefone.setText("");
-        txtRua.setText("");
-        txtNum.setText("");
-        txtBairro.setText("");
-        txtCidade.setText("");
-        txtCEP.setText("");
-        txtPais.setText("");
-        btnSalvar.setText("Salvar");
-    }
-     public void preencherTabela(){
-        FornecedorDAO fDAO=new FornecedorDAO();
-        List<Beans.Fornecedor> listaFornecedor=fDAO.getFornecedor();
-        
-        DefaultTableModel tabelaFornecedor=(DefaultTableModel) tblFornecedor.getModel();
-        tabelaFornecedor.setRowCount(0); 
-        
-        for(Beans.Fornecedor c: listaFornecedor){
-            Object[] obj= new Object[]{
-                c.getId(),
-                c.getNome(),
-                c.getCnpj(),
-                c.getNome_fantasia(),
-                c.getEmail(),
-                c.getTelefone(),
-                c.getPais(),
-                c.getEstado(),
-                c.getCidade(),
-                c.getCep(),
-                c.getRua(),
-                c.getNumero(),
-                c.getBairro()
-                
-            }; 
-             tabelaFornecedor.addRow(obj);
+            private void limparFormulario(){
+            txtNome.setText("");
+            txtNomeFt.setText("");
+            txtCnpj.setText("");
+            txtEmail.setText("");
+            txtTelefone.setText("");
+            txtRua.setText("");
+            txtNum.setText("");
+            txtBairro.setText("");
+            txtCidade.setText("");
+            txtCEP.setText("");
+            txtPais.setText("");
+            btnSalvar.setText("Salvar");
         }
-        
-    }  
-      
+        public void preencherTabela(){
+           FornecedorDAO fDAO=new FornecedorDAO();
+           List<Beans.Fornecedor> listaFornecedor=fDAO.getFornecedor();
+
+           DefaultTableModel tabelaFornecedor=(DefaultTableModel) 
+                   tblFornecedor.getModel();
+           tabelaFornecedor.setRowCount(0); 
+
+           for(Beans.Fornecedor c: listaFornecedor){
+               Object[] obj= new Object[]{
+                   c.getId(),
+                   c.getNome(),
+                   c.getCnpj(),
+                   c.getNome_fantasia(),
+                   c.getEmail(),
+                   c.getTelefone(),
+                   c.getPais(),
+                   c.getEstado(),
+                   c.getCidade(),
+                   c.getCep(),
+                   c.getRua(),
+                   c.getNumero(),
+                   c.getBairro()
+
+               }; 
+                tabelaFornecedor.addRow(obj);
+           }
+
+       }  
+
    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -556,7 +547,7 @@ public class Fornecedor extends javax.swing.JFrame {
         edicaoAtiva=true;
         DefaultTableModel modelo = (DefaultTableModel) tblFornecedor.getModel();
 
-        // Pegando os valores da tabela
+       
         int id = (int) modelo.getValueAt(linhaSelecionada, 0);
         String nome = (String) modelo.getValueAt(linhaSelecionada, 1);
         String cnpj = (String) modelo.getValueAt(linhaSelecionada, 2);
@@ -585,13 +576,12 @@ public class Fornecedor extends javax.swing.JFrame {
         txtNum.setText(numero);
         txtBairro.setText(bairro);
 
-     
-
-        // Muda o texto do botão salvar para indicar edição
+    
         btnSalvar.setText("Atualizar");
 
         JOptionPane.showMessageDialog(this, 
-            "Modo de edição ativado. Faça as alterações e clique em 'Atualizar'.");
+            "Modo de edição ativado. Faça as alterações e "
+                    + "clique em 'Atualizar'.");
     } else {
         JOptionPane.showMessageDialog(this, 
             "Selecione um cliente na tabela para editar!");

@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package DAO;
 
 import Beans.Fornecedor;
@@ -11,12 +8,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
         
-        
-
-/**
- *
- * @author Marina Souza
- */
 public class ProdutoDAO {
     
     private Conexao conexao;
@@ -26,20 +17,17 @@ public class ProdutoDAO {
         this.conexao = new Conexao();
         this.conn = this.conexao.getConexao();
     }
-    
-    
+      
     public int inserirProduto(Produto produto){
         String sql = "INSERT INTO produto (prd_nome,prd_cod_barras,"
                 + "prd_descricao,prd_preco_venda,"
                 + "prd_qtd_estoque,fnc_id) VALUES(?,?,?,?,?,?)";
        
     if (produto.getFornecedor() == null) {
-        System.err.println("Erro: Fornecedor do produto não pode ser nulo.");
-        
+        System.err.println("Erro: Fornecedor do produto não pode ser nulo.");     
         return -1; 
     }
-
-        try{
+         try{
             PreparedStatement stmt = this.conn.prepareStatement
             (sql,Statement.RETURN_GENERATED_KEYS);
              stmt.setString(1, produto.getNome());
@@ -72,7 +60,8 @@ public class ProdutoDAO {
          
         public int getNextId(){
         int nextId = 1;
-        String sql = "SELECT COALESCE(MAX(prd_id), 0) + 1 AS nextId FROM produto";
+        String sql = "SELECT COALESCE(MAX(prd_id), 0) + "
+                + "1 AS nextId FROM produto";
 
         try {
             PreparedStatement ps = this.conn.prepareStatement(sql);
@@ -138,13 +127,13 @@ public class ProdutoDAO {
                + "fnc_id = ? "
                + "WHERE prd_id = ?";
             
-             // NOVO BLOCO: VERIFICAÇÃO DE NULIDADE
+             
     if (produto.getFornecedor() == null) {
         System.err.println("Erro ao editar: Fornecedor do produto "
                 + "não pode ser nulo.");
         return false;
     }
-    // FIM NOVO BLOCO
+
 
     try (PreparedStatement stmt = conn.prepareStatement(sql)) {
         stmt.setString(1, produto.getNome());
@@ -206,27 +195,7 @@ public class ProdutoDAO {
     
     return listaProdutos;
 }
-public Produto buscarPorNome(String nome) {
-    String sql = "SELECT * FROM produto WHERE prd_nome = ?";
-    try (Connection conn = new Conexao().getConexao();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        stmt.setString(1, nome);
-        ResultSet rs = stmt.executeQuery();
-
-        if (rs.next()) {
-            Produto p = new Produto();
-            p.setId(rs.getInt("prd_id"));
-            p.setNome(rs.getString("prd_nome"));
-            p.setPrecoVenda(rs.getDouble("prd_preco_venda"));
-            return p;
-        }
-
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-    return null;
-}
 
 public boolean temNotaFiscalVinculada(int idProduto) {
     String sql = "SELECT COUNT(*) FROM itemNotaFiscal WHERE prd_id = ?";
@@ -257,7 +226,8 @@ public int getEstoqueAtual(int idProduto) {
 }
 
 public void atualizarEstoque(int idProduto, int ajuste) {
-    String sql = "UPDATE produto SET prd_qtd_estoque = prd_qtd_estoque + ? WHERE prd_id = ?";
+    String sql = "UPDATE produto SET prd_qtd_estoque = prd_qtd_estoque + "
+            + "? WHERE prd_id = ?";
     try (PreparedStatement stmt = conn.prepareStatement(sql)) {
         stmt.setInt(1, ajuste);
         stmt.setInt(2, idProduto);

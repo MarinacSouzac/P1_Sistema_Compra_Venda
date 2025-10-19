@@ -1,11 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package Beans;
 
 /**
- *
+ *Classe criada para objeto Produto
  * @author Marina Souza
  */
 public class Produto {
@@ -20,7 +17,7 @@ public class Produto {
     
     @Override
     public String toString() {
-        return this.id+"-"+this.nome; // Mostra o nome no JComboBox
+        return this.id+"-"+this.nome; 
     }
     
     public int getId() {

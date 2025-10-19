@@ -2,7 +2,6 @@
 package Beans;
 
 /**
- * 
  * Classe Criada para Criar Objeto Item da Nota Fiscak
  * @author Marina Souza
  */
@@ -32,11 +31,11 @@ public void setNtf(NotaFiscal notaFiscal) {
     this.notaFiscal = notaFiscal;
 }
 
-   public Produto getPrd() {  // estava ok
+   public Produto getPrd() {  
    return produto;
     }
 
-    public void setPrd(Produto produto) {  // aqui tinha idPrd e atribuía produto errado
+    public void setPrd(Produto produto) {  
         this.produto = produto;
     }
 
