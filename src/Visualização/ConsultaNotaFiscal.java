@@ -1,5 +1,5 @@
-
 package Visualização;
+
 import DAO.NotaFiscalDAO;
 import Beans.NotaFiscal;
 import java.util.ArrayList;
@@ -8,122 +8,125 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import java.time.format.DateTimeFormatter;
 
-
-
 public class ConsultaNotaFiscal extends javax.swing.JFrame {
-    
-    private static final java.util.logging.Logger logger = 
-    java.util.logging.Logger.getLogger(ConsultaNotaFiscal.class.getName());     
+
+    private static final java.util.logging.Logger logger =
+            java.util.logging.Logger.getLogger(ConsultaNotaFiscal.class.getName());
 
     public ConsultaNotaFiscal() {
-     initComponents();
-     mostrarTodasNotas();
-     setLocationRelativeTo(null);
-     cmbID.setEnabled(false);
-     cmbTipo.addActionListener(e -> {
-        cmbID.setEnabled(true); 
-        atualizarIDsPorTipo();  
-     });
-     btnBuscar.addActionListener(e -> filtrarNotas());
-     btnLimpar.addActionListener(e -> {
-        cmbTipo.setSelectedIndex(-1);
-        cmbID.setSelectedItem("");
+        initComponents();
+        mostrarTodasNotas();
+        setLocationRelativeTo(null);
         cmbID.setEnabled(false);
-        mostrarTodasNotas();
-     });
-        
-    }
-    
- private void atualizarIDsPorTipo() {
-    int tipo = cmbTipo.getSelectedIndex(); 
-    NotaFiscalDAO dao = new NotaFiscalDAO();
-    List<NotaFiscal> notas = dao.buscarPorTipo(tipo);
-    cmbID.removeAllItems();
-    for (NotaFiscal nf : notas) {
-        cmbID.addItem(String.valueOf(nf.getId()));
-    }
 
-    cmbID.setEnabled(true);
-}
+        cmbTipo.addActionListener(e -> {
+            cmbID.setEnabled(true);
+            atualizarIDsPorTipo();
+        });
 
-     private void filtrarNotas() {
-    NotaFiscalDAO dao = new NotaFiscalDAO();
-    List<NotaFiscal> notasFiltradas = new ArrayList<>();
+        btnBuscar.addActionListener(e -> filtrarNotas());
 
-    String idTexto = (String) cmbID.getEditor().getItem();
-    boolean idPreenchido = idTexto != null && !idTexto.trim().isEmpty();
-    int tipoSelecionado = cmbTipo.getSelectedIndex();
-
-    // Caso nenhum tipo seja selecionado, mostra tudo
-    if (tipoSelecionado == -1) {
-        mostrarTodasNotas();
-        return;
+        btnLimpar.addActionListener(e -> {
+            cmbTipo.setSelectedIndex(-1);
+            cmbID.setSelectedItem("");
+            cmbID.setEnabled(false);
+            mostrarTodasNotas();
+        });
     }
 
-    // Se o ID foi preenchido, busca por ele
-    if (idPreenchido) {
-        try {
-            int id = Integer.parseInt(idTexto.trim());
-            NotaFiscal nf = dao.buscarPorId(id);
-            if (nf != null) {
-                int tipoNota = nf.isTipo() ? 1 : 0;
-                if (tipoNota == tipoSelecionado) {
-                    notasFiltradas.add(nf);
-                } else {
-                    JOptionPane.showMessageDialog(this, 
-                        "O ID informado pertence a outro tipo de nota.");
-                    return;
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, 
-                    "Nenhuma nota encontrada com o ID informado.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "ID inválido.");
+    private void atualizarIDsPorTipo() {
+        int tipo = cmbTipo.getSelectedIndex();
+        NotaFiscalDAO dao = new NotaFiscalDAO();
+        List<NotaFiscal> notas = dao.buscarPorTipo(tipo);
+
+        cmbID.removeAllItems();
+        for (NotaFiscal nf : notas) {
+            cmbID.addItem(String.valueOf(nf.getId()));
+        }
+
+        cmbID.setEnabled(true);
+    }
+
+    private void filtrarNotas() {
+        NotaFiscalDAO dao = new NotaFiscalDAO();
+        List<NotaFiscal> notasFiltradas = new ArrayList<>();
+
+        String idTexto = (String) cmbID.getEditor().getItem();
+        boolean idPreenchido = idTexto != null && !idTexto.trim().isEmpty();
+        int tipoSelecionado = cmbTipo.getSelectedIndex();
+
+        // Caso nenhum tipo seja selecionado, mostra tudo
+        if (tipoSelecionado == -1) {
+            mostrarTodasNotas();
             return;
         }
-    } else {
-        // Se o ID não foi informado, filtra todas pelo tipo selecionado
-        notasFiltradas = dao.buscarPorTipo(tipoSelecionado);
+
+        // Se o ID foi preenchido, busca por ele
+        if (idPreenchido) {
+            try {
+                int id = Integer.parseInt(idTexto.trim());
+                NotaFiscal nf = dao.buscarPorId(id);
+
+                if (nf != null) {
+                    int tipoNota = nf.isTipo() ? 1 : 0;
+                    if (tipoNota == tipoSelecionado) {
+                        notasFiltradas.add(nf);
+                    } else {
+                        JOptionPane.showMessageDialog(this,
+                                "O ID informado pertence a outro tipo de nota.");
+                        return;
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                            "Nenhuma nota encontrada com o ID informado.");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "ID inválido.");
+                return;
+            }
+        } else {
+            // Se o ID não foi informado, filtra todas pelo tipo selecionado
+            notasFiltradas = dao.buscarPorTipo(tipoSelecionado);
+        }
+
+        // Atualiza tabela
+        DefaultTableModel model = (DefaultTableModel) tblLtNF.getModel();
+        model.setRowCount(0);
+
+        for (NotaFiscal nf : notasFiltradas) {
+            model.addRow(new Object[]{
+                    nf.getId(),
+                    nf.isTipo() ? "Saída" : "Entrada",
+                    nf.getFornecedor() != null ? nf.getFornecedor().getNome() : "-",
+                    nf.getCliente() != null ? nf.getCliente().getNome() : "-",
+                    nf.getDataVenda().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                    nf.getQtdTotal(),
+                    nf.getValorTotal()
+            });
+        }
     }
 
-    // Atualiza tabela
-    DefaultTableModel model = (DefaultTableModel) tblLtNF.getModel();
-    model.setRowCount(0);
+    private void mostrarTodasNotas() {
+        NotaFiscalDAO dao = new NotaFiscalDAO();
+        List<NotaFiscal> notas = dao.getNotas();
 
-    for (NotaFiscal nf : notasFiltradas) {
-        model.addRow(new Object[]{
-            nf.getId(),
-            nf.isTipo() ? "Saída" : "Entrada",
-            nf.getFornecedor() != null ? nf.getFornecedor().getNome() : "-",
-            nf.getCliente() != null ? nf.getCliente().getNome() : "-",
-            nf.getDataVenda().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-            nf.getQtdTotal(),
-            nf.getValorTotal()
-        });
+        DefaultTableModel model = (DefaultTableModel) tblLtNF.getModel();
+        model.setRowCount(0);
+
+        for (NotaFiscal nf : notas) {
+            model.addRow(new Object[]{
+                    nf.getId(),
+                    nf.isTipo() ? "Saída" : "Entrada",
+                    nf.getFornecedor() != null ? nf.getFornecedor().getNome() : "-",
+                    nf.getCliente() != null ? nf.getCliente().getNome() : "-",
+                    nf.getDataVenda().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                    nf.getQtdTotal(),
+                    nf.getValorTotal()
+            });
+        }
     }
-}
 
-private void mostrarTodasNotas() {
-    NotaFiscalDAO dao = new NotaFiscalDAO();
-    List<NotaFiscal> notas = dao.getNotas();
-
-    DefaultTableModel model = (DefaultTableModel) tblLtNF.getModel();
-    model.setRowCount(0);
-
-    for (NotaFiscal nf : notas) {
-        model.addRow(new Object[]{
-            nf.getId(),
-            nf.isTipo() ? "Saída" : "Entrada",
-            nf.getFornecedor() != null ? nf.getFornecedor().getNome() : "-",
-            nf.getCliente() != null ? nf.getCliente().getNome() : "-",
-            nf.getDataVenda().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-            nf.getQtdTotal(),
-            nf.getValorTotal()
-        });
-    }
-}
 
  
     

@@ -150,20 +150,15 @@ public class NotaFiscal extends javax.swing.JFrame {
     // Carrega produtos (geral) para cliente
     private void carregarProdutosPorCliente() {
         cmbProduto.removeAllItems();
-        Cliente atual = (Cliente) cmbCliente.getSelectedItem();
+        //Cliente atual = (Cliente) cmbCliente.getSelectedItem();
 
         // Impede troca de cliente após adicionar itens
-        if (clienteFixado != null && atual != null && atual.getId() != clienteFixado.getId()) {
-            JOptionPane.showMessageDialog(this, 
-                "Não é permitido trocar de cliente após adicionar itens.");
-            cmbCliente.setSelectedItem(clienteFixado);
-            return;
-        }
+        
 
-        Object selected = cmbCliente.getSelectedItem();
-        if (!(selected instanceof Cliente)) return;
+        //Object selected = cmbCliente.getSelectedItem();
+        //if (!(selected instanceof Cliente)) return;
 
-        Cliente c = (Cliente) selected;
+       // Cliente c = (Cliente) selected;
         ProdutoDAO dao = new ProdutoDAO();
         List<Produto> produtos = dao.getProduto();
 
